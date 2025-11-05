@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload Tool - BlackBox</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 0;
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -1px;
+      margin-bottom: 10px;
+    }
+
+    .header p {
+      color: #888;
+      font-size: 1.05em;
+    }
+
+    .upload-section {
+      background: linear-gradient(135deg, #1a1a1a, #141414);
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-group {
+      margin-bottom: 28px;
+    }
+
+    .form-label {
+      display: block;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 0.95em;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 14px 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #2a2a2a;
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 1em;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #4a4a4a;
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-input::placeholder,
+    .form-textarea::placeholder {
+      color: #555;
+    }
+
+    .image-upload-area {
+      width: 100%;
+      min-height: 200px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px dashed #2a2a2a;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .image-upload-area:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #4a4a4a;
+    }
+
+    .image-upload-area.has-image {
+      border-style: solid;
+    }
+
+    .upload-icon {
+      margin-bottom: 16px;
+    }
+
+    .upload-icon svg {
+      width: 48px;
+      height: 48px;
+      color: #666;
+    }
+
+    .upload-text {
+      color: #888;
+      font-size: 1em;
+      margin-bottom: 8px;
+    }
+
+    .upload-subtext {
+      color: #555;
+      font-size: 0.85em;
+    }
+
+    .image-preview {
+      max-width: 100%;
+      max-height: 300px;
+      border-radius: 8px;
+      display: none;
+    }
+
+    .image-preview.show {
+      display: block;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .token-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .token-icon {
+      position: absolute;
+      left: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .token-icon svg {
+      width: 20px;
+      height: 20px;
+      color: #888;
+    }
+
+    .token-input {
+      padding-left: 90px;
+    }
+
+    .price-display {
+      margin-top: 8px;
+      color: #888;
+      font-size: 0.9em;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 16px;
+      background: linear-gradient(135deg, #ffffff, #e0e0e0);
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-weight: 700;
+      font-size: 1.05em;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
+      margin-top: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .submit-btn:hover {
+      background: linear-gradient(135deg, #ffffff, #f5f5f5);
+      box-shadow: 0 6px 24px rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .submit-btn svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .cancel-btn {
+      width: 100%;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      color: #888;
+      font-weight: 600;
+      font-size: 1em;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      margin-top: 12px;
+    }
+
+    .cancel-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: #3a3a3a;
+      color: #aaa;
+    }
+
+    .info-box {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #2a2a2a;
+      border-left: 3px solid #4a4a4a;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 30px;
+    }
+
+    .info-box-title {
+      color: #ffffff;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-box-title svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .info-box-text {
+      color: #888;
+      font-size: 0.9em;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .upload-section {
+        padding: 24px 20px;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .image-upload-area {
+        min-height: 180px;
+      }
+
+      .upload-icon svg {
+        width: 40px;
+        height: 40px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .header h1 {
+        font-size: 1.8em;
+      }
+
+      .token-input {
+        padding-left: 80px;
+      }
+
+      .token-icon {
+        left: 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <br>
+    <div class="header">
+      <h1>Upload New Tool</h1>
+      <p>Share your tools with the BlackBox community</p>
+    </div>
+    <div class="upload-section">
+      <div class="info-box">
+        <div class="info-box-title">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Guidelines
+        </div>
+        <div class="info-box-text">
+          Make sure your tool is properly tested and documented. Include clear descriptions and set a fair price in tokens.
+        </div>
+      </div>
+
+      <form id="uploadForm">
+        <div class="form-group">
+          <label class="form-label">Tool Name</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="e.g., SecureVault Pro"
+            id="tool_name"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea 
+            class="form-textarea" 
+            placeholder="Describe what your tool does and its key features..."
+            id="description"
+            required
+          ></textarea>
+        </div>
+        <!-- Newly added code -->
+        <div class="form-group">
+          <label class="form-label">HOW TO USE</label>
+          <textarea 
+            class="form-textarea" 
+            placeholder="Paste youtube tutorial link or detailed explanation on tool usage."
+            id="usage"
+            required
+          ></textarea>
+          <div class="price-display" style="margin-top: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Give a detailed info on how to use your tool or paste a youtube tutorial link
+          </div>
+        </div>
+        
+        <!-- Ends here -->
+
+        <div class="form-group">
+          <label class="form-label">Tool Image</label>
+          <div class="image-upload-area" id="imageUploadArea">
+            <div class="upload-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            </div>
+            <div class="upload-text">Click to upload image</div>
+            <div class="upload-subtext">PNG, JPG up to 5MB</div>
+            <img id="imagePreview" class="image-preview" alt="Preview">
+          </div>
+          <input 
+            type="file" 
+            class="file-input" 
+            id="fileInput" 
+            accept="image/*"
+          />
+        </div>
+
+        <div class="form-row">
+          
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Price (Tokens)</label>
+          <div class="token-input-wrapper">
+            <div class="token-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="12" y1="2" x2="12" y2="6"/></svg>
+              <span style="color: #888; font-size: 0.9em;">Tokens</span>
+            </div>
+            <input 
+              type="number" 
+              class="form-input token-input" 
+              id="priceInput"
+              placeholder="0"
+              min="0"
+              required
+            />
+          </div>
+          <div class="price-display" id="priceDisplay">Free</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Download Link</label>
+          <input 
+            type="url" 
+            class="form-input" 
+            placeholder="https://example.com/your-tool.apk"
+            id="download"
+            required
+          />
+          <div class="price-display" style="margin-top: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            Paste the direct download link to your already hosted APK file
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Tool
+        </button>
+
+        <button type="button" class="cancel-btn" onclick="history.back()">
+          Cancel
+        </button>
+      </form>
+      <br>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { ref, get, set, getDatabase } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { onAuthStateChanged, getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
+      authDomain: "uamtv-c031c.firebaseapp.com",
+      databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
+      projectId: "uamtv-c031c",
+      storageBucket: "uamtv-c031c.firebasestorage.app",
+      messagingSenderId: "9790917697",
+      appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
+      measurementId: "G-RSXW1XBVQZ"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase();
+    
+    console.log('🔥 Firebase initialized:', app.name);
+
+    // Get DOM elements
+    const imageUploadArea = document.getElementById('imageUploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const priceInput = document.getElementById('priceInput');
+    const priceDisplay = document.getElementById('priceDisplay');
+    const uploadForm = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const download = document.getElementById("download");
+    const tool_name = document.getElementById("tool_name");
+    const description = document.getElementById("description");
+    const usage = document.getElementById("usage");
+
+    let selectedImageBase64 = null;
+    let currentUserData = null;
+
+    // 🆕 FETCH USER DATA WHEN AUTH STATE CHANGES
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log('✅ User logged in:', user.uid);
+        
+        try {
+          const userRef = ref(db, `users/${user.uid}`);
+          const userSnapshot = await get(userRef);
+          
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.val();
+            currentUserData = {
+              uid: user.uid,
+              nickname: userData.nickname || 'Anonymous',
+              avatar: userData.avatar || '',
+              role: userData.role || 'User'
+            };
+            console.log('✅ User data loaded:', currentUserData);
+          } else {
+            console.warn('⚠️ User data not found in database');
+            currentUserData = {
+              uid: user.uid,
+              nickname: 'Anonymous',
+              avatar: '',
+              role: 'User'
+            };
+          }
+        } catch (error) {
+          console.error('❌ Error fetching user data:', error);
+        }
+      } else {
+        console.log('⚠️ No user logged in');
+        currentUserData = null;
+        // Optionally redirect to login
+        // window.location.href = './login.html';
+      }
+    });
+
+    // Click to upload image
+    imageUploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // Handle file selection
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          selectedImageBase64 = e.target.result;
+          imagePreview.src = selectedImageBase64;
+          imagePreview.classList.add('show');
+          imageUploadArea.classList.add('has-image');
+          imageUploadArea.querySelector('.upload-icon').style.display = 'none';
+          imageUploadArea.querySelector('.upload-text').style.display = 'none';
+          imageUploadArea.querySelector('.upload-subtext').style.display = 'none';
+          console.log('✅ Image stored');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Update price display
+    priceInput.addEventListener('input', (e) => {
+      const value = parseInt(e.target.value) || 0;
+      priceDisplay.textContent = value === 0 ? 'Free' : `${value.toLocaleString()} tokens`;
+    });
+
+    // 🆕 GENERATE TOOL ID
+    function generateToolId(length = 7) {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let id = '';
+      for (let i = 0; i < length; i++) {
+        id += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return id;
+    }
+
+    // 🆕 HANDLE FORM SUBMISSION WITH USER DATA
+    uploadForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      // Check if user is logged in
+      if (!currentUserData || !auth.currentUser) {
+        alert('Please log in to upload tools');
+        return;
+      }
+      
+      // Check if image was selected
+      if (!selectedImageBase64) {
+        alert('Please select an image for your tool');
+        return;
+      }
+      
+      // Get form values
+      const name = tool_name.value.trim();
+      const description_info = description.value.trim();
+      const tokens = parseInt(priceInput.value) || 0;
+      const download_link = download.value.trim();
+      const toolId = generateToolId();
+      const usage_link = usage.value.trim();
+      
+      
+      // Disable submit button
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Uploading...';
+      
+      // 🆕 CREATE TOOL DATA WITH USER INFORMATION
+      const toolData = {
+        name: name,
+        description: description_info,
+        price: tokens,
+        downloadUrl: download_link,
+        image: selectedImageBase64,
+        uploadedAt: Date.now(),
+        uploadedBy: currentUserData.uid,
+        uploaderName: currentUserData.nickname,
+        uploaderAvatar: currentUserData.avatar,
+        uploaderRole: currentUserData.role,
+        toolId: toolId,
+        downloads: 0,
+        tool_usage: usage_link,
+        howToUse: usage
+      };
+      
+      console.log('📤 Uploading tool:', toolData);
+      
+      try {
+        // 🆕 SAVE TO: tools/{userId}/{toolId}
+        await set(ref(db, `tools/${currentUserData.uid}/${toolId}`), toolData);
+        
+        console.log('✅ Tool uploaded successfully!');
+        alert('Tool uploaded successfully!');
+        
+        // Reset form
+        resetForm();
+        
+        // Optionally redirect to profile
+        // setTimeout(() => {
+        //   window.location.href = './profile.html';
+        // }, 1000);
+        
+      } catch (error) {
+        console.error('❌ Upload error:', error);
+        alert('Upload failed: ' + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload Tool
+        `;
+      }
+    });
+
+
+
+
+
+
+
+
+
+    
+
+    // Function to reset the form
+    function resetForm() {
+      uploadForm.reset();
+      selectedImageBase64 = null;
+      imagePreview.classList.remove('show');
+      imageUploadArea.classList.remove('has-image');
+      imageUploadArea.querySelector('.upload-icon').style.display = 'block';
+      imageUploadArea.querySelector('.upload-text').style.display = 'block';
+      imageUploadArea.querySelector('.upload-subtext').style.display = 'block';
+      priceDisplay.textContent = 'Free';
+      console.log('✅ Form reset');
+    }
+
+    // Drag and drop functionality
+    imageUploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      imageUploadArea.style.borderColor = '#4a4a4a';
+      imageUploadArea.style.background = 'rgba(255, 255, 255, 0.05)';
+    });
+
+    imageUploadArea.addEventListener('dragleave', () => {
+      imageUploadArea.style.borderColor = '#2a2a2a';
+      imageUploadArea.style.background = 'rgba(255, 255, 255, 0.03)';
+    });
+
+    imageUploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      imageUploadArea.style.borderColor = '#2a2a2a';
+      imageUploadArea.style.background = 'rgba(255, 255, 255, 0.03)';
+      
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith('image/')) {
+        fileInput.files = e.dataTransfer.files;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          selectedImageBase64 = e.target.result;
+          imagePreview.src = selectedImageBase64;
+          imagePreview.classList.add('show');
+          imageUploadArea.classList.add('has-image');
+          imageUploadArea.querySelector('.upload-icon').style.display = 'none';
+          imageUploadArea.querySelector('.upload-text').style.display = 'none';
+          imageUploadArea.querySelector('.upload-subtext').style.display = 'none';
+          console.log('✅ Image stored (drag & drop)');
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  </script>
+</body>
+</html>

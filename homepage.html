@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Black Box</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="description" content="BlackBox — private APK vault. Download secure apps, encrypted snapshots, and more.">
+  <style>
+  
+    /* Mobile navbar and sidebar overlay */
+    .mobile-navbar {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 50px;
+      background: rgba(20, 20, 20, 0.95);
+      z-index: 1002;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      box-sizing: border-box;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0, 255, 127, 0.2);
+    }
+
+    .navbar-content {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .balance-display {
+      background: linear-gradient(135deg, #00ff7f22, #00ff7f11);
+      border: 1px solid #00ff7f44;
+      padding: 6px 12px;
+      min-width: 120px;
+      border-radius: 8px;
+      color: #00ff9c;
+      font-size: 0.85em;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0, 255, 127, 0.1);
+    }
+    
+    .menu-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.8em;
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    
+    .menu-btn:hover {
+      color: #00ff7f;
+    }
+    
+    @media (max-width: 600px) {
+      .mobile-navbar {
+        display: flex;
+      }
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -200px;
+        width: 180px;
+        height: 100vh;
+        background: rgba(30, 30, 30, 0.95);
+        box-shadow: 2px 0 12px rgba(0,0,0,0.3);
+        z-index: 1001;
+        transition: left 0.3s cubic-bezier(.4,0,.2,1);
+        backdrop-filter: blur(8px);
+        overflow-y: auto;
+      }
+      .sidebar.active {
+        left: 0;
+      }
+      .main {
+        margin-top: 50px;
+        padding-bottom: 100px;
+      }
+      .background-grid {
+        z-index: 0;
+      }
+      .main-footer-nav {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        z-index: 1002;
+      }
+    }
+    
+    * {
+      font-family: 'Orbitron', sans-serif;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Roboto', Arial, sans-serif;
+      background: radial-gradient(black, #050505);
+      min-height: 100vh;
+      overflow: hidden;
+      display: flex;
+      position: relative;
+    }
+    
+    .background-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(white 1px, transparent 1px),
+        linear-gradient(90deg, white 1px, transparent 1px);
+      background-size: 40px 40px;
+      opacity: 0.04;
+      z-index: 0;
+      pointer-events: none;
+    }
+    
+    .sidebar {
+      width: 280px;
+      background: linear-gradient(135deg, #1a1a1a, #141414);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #2a2a2a;
+      z-index: 1001;
+      box-shadow: 2px 0 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .sidebar-header {
+      padding: 30px 20px;
+      background: linear-gradient(135deg, #1a1a1a, #141414);
+      border-bottom: 1px solid #2a2a2a;
+    }
+
+    .sidebar-header .logo {
+      font-size: 1.5em;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    
+    .sidebar-nav {
+      padding: 20px;
+      border-bottom: 1px solid #2a2a2a;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .nav-btn {
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+      border: 1px solid #2a2a2a;
+      padding: 14px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95em;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      text-align: left;
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: #3a3a3a;
+      transform: translateX(4px);
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #4a4a4a;
+    }
+
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      color: #888;
+    }
+    
+    .main {
+      flex: 1;
+      background: #0a0a0a;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      padding-bottom: 50px;
+    }
+    
+    .main-header {
+      padding: 16px;
+      background: #202c33;
+      color: #fff;
+      font-weight: 500;
+      border-bottom: 1px solid #222;
+      display: none;
+    }
+    
+    .chat-area {
+      flex: 1;
+      padding: 24px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      display: none;
+    }
+    
+    .message {
+      max-width: 60%;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 1em;
+      background: #202c33;
+      color: #fff;
+      align-self: flex-start;
+      display: none;
+    }
+    
+    .message.sent {
+      background: #005c4b;
+      align-self: flex-end;
+    }
+    
+    .main-footer {
+      padding: 16px;
+      background: #202c33;
+      border-top: 1px solid #222;
+      display: none;
+      gap: 8px;
+    }
+    
+    .main-footer input {
+      flex: 1;
+      padding: 10px;
+      border-radius: 20px;
+      border: none;
+      font-size: 1em;
+      background: #111b21;
+      color: #fff;
+    }
+    
+    .main-footer-nav {
+      width: 100%;
+      background: rgba(10, 10, 10, 0.95);
+      color: #fff;
+      padding: 16px 0;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 24px;
+      height: auto;
+      border-top: 1px solid rgba(0, 255, 127, 0.3);
+      flex-shrink: 0;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .main-footer button {
+      background: #005c4b;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.2em;
+      cursor: pointer;
+      display: none;
+    }
+    
+    :root {
+      --bg: #060608;
+      --panel: #0f1113;
+      --muted: #8a8f98;
+      --accent: #00ff7f;
+      --accent-2: #9ad3ff;
+      font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      color-scheme: dark;
+    }
+    
+    .logo {
+      font-weight: 800;
+      letter-spacing: 2px;
+      font-size: 19px;
+    }
+    
+    .logo span {
+      color: var(--accent);
+    }
+
+    .footer-items {
+      background: linear-gradient(135deg, #000000, #0a0a0a);
+      border: 1.5px solid rgba(255, 255, 255, 0.15);
+      padding: 8px 16px;
+      color: #00ff7f;
+      width: 85%;
+      max-width: 500px;
+      height: 70px;
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), 
+                  0 0 20px rgba(0, 255, 127, 0.1),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(16px);
+      gap: 8px;
+    }
+    
+    .feed-txt {
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.75em;
+      font-weight: 500;
+      margin-top: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .feed-div {
+      text-align: center;
+      padding: 12px 14px;
+      min-width: 70px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.6), rgba(20, 20, 20, 0.4));
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .feed-div:hover {
+      background: linear-gradient(135deg, rgba(0, 255, 127, 0.15), rgba(0, 255, 127, 0.05));
+      box-shadow: 0 4px 16px rgba(0, 255, 127, 0.3), 
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transform: translateY(-3px);
+      border-color: rgba(0, 255, 127, 0.4);
+    }
+    
+    .feed-div:active {
+      transform: translateY(-1px);
+    }
+
+    .feed-img {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .feed-img svg {
+      width: 24px;
+      height: 24px;
+      color: #00ff7f;
+      transition: all 0.3s ease;
+    }
+    
+    .feed-div:hover .feed-img svg {
+      color: #00ffaa;
+      transform: scale(1.1);
+    }
+
+    #mainframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .sidebar {
+        width: 180px;
+        min-width: 180px;
+        font-size: 0.9em;
+      }
+      .sidebar-header {
+        font-size: 1em;
+        padding: 20px 15px;
+      }
+      .sidebar-nav {
+        padding: 15px;
+        gap: 10px;
+      }
+      .nav-btn {
+        padding: 12px 14px;
+        font-size: 0.85em;
+      }
+      .nav-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .main {
+        padding: 0;
+      }
+      .footer-items {
+        width: 92%;
+        height: 65px;
+        padding: 6px 12px;
+        gap: 4px;
+      }
+      .feed-div {
+        padding: 10px 8px;
+        min-width: 60px;
+      }
+      .feed-img svg {
+        width: 20px;
+        height: 20px;
+      }
+      .feed-txt {
+        font-size: 0.7em;
+      }
+    }
+   @media(max-width:600px){
+    #mainframe{
+      padding-bottom:30%;
+    }
+   }
+  </style>
+</head>
+<body>
+  <div class="mobile-navbar">
+    <div class="navbar-content">
+      <button class="menu-btn" id="openSidebar">&#9776;</button>
+      <span class="logo"><span style="color: #dee4ee;">BLACK</span><span>BOX</span></span>
+    </div>
+    <div class="balance-display">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00ff9c;">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+        <line x1="12" y1="18" x2="12" y2="22"/>
+        <line x1="12" y1="2" x2="12" y2="6"/>
+      </svg>
+      <span id="token_amount">0</span>
+      <span style="opacity: 0.8;">Tokens</span>
+    </div>
+  </div>
+  
+  <div class="background-grid"></div>
+  <div class="sidebar-overlay" id="sidebarOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(0,0,0,0.6);"></div>
+  
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <!-- <span style="color: #dee4ee;">BLACK</span><span style="color: #00ff7f;">BOX</span> -->
+      </div>
+    </div>
+    <div class="sidebar-nav">
+      <button class="nav-btn active" id="marketBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Market
+      </button>
+  
+      <button class="nav-btn active" id="uploadBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        Uploads
+      </button>
+      <button class="nav-btn active" id="userBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Users
+      </button>
+
+      <button class="nav-btn active" id="chatBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+     <line x1="9" y1="10" x2="15" y2="10"/>
+     <line x1="9" y1="14" x2="13" y2="14"/>
+   </svg>
+        Chats
+      </button> 
+
+      <button class="nav-btn active" id="topUpBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+       viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="9"/>
+    <polyline points="12 16 12 8 8 12"/>
+    <polyline points="12 8 16 12"/>
+  </svg>
+  Top Up
+      </button> 
+      <button class="nav-btn active" id="transactionBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v12M8 10c0-1.1.9-2 2-2h4a2 2 0 0 1 0 4h-4a2 2 0 0 0 0 4h4c1.1 0 2-.9 2-2"></path>
+        </svg>
+        
+  Transactions
+      </button> 
+      
+
+      <button class="nav-btn active" id="logOutBtn" style="width: 150px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+        stroke-linejoin="round">
+     <circle cx="12" cy="12" r="10" fill="#e53935" opacity="0.15"/>
+     <polyline points="16 17 21 12 16 7" fill="none" stroke="#e53935"/>
+     <line x1="21" y1="12" x2="9" y2="12" stroke="#e53935"/>
+     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" stroke="#e53935"/>
+   </svg>
+        Logout
+      </button> 
+
+      <button class="nav-btn active" id="settingsBtn" style="width: 150px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+       stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3" />
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33
+             1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51
+             1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06
+             a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+             a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06
+             a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33
+             1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09
+             a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06
+             a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82
+             1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09
+             a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+  Settings
+      </button> 
+      
+    </div>
+  </div>
+
+  <div class="main">
+    <iframe id="mainframe" src="Market/market.html"></iframe>
+    
+    <footer class="main-footer-nav">
+      <div class="footer-items">
+        <div class="feed-div" id="homeBtn">
+          <div class="feed-img">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </div>
+          <div class="feed-txt">Home</div>
+        </div>
+        <div class="feed-div" id="LivechatBtn">
+          <div class="feed-img">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </div>
+          <div class="feed-txt">Live Chat</div>
+        </div>
+        <div class="feed-div" id="bankBtn">
+          <div class="feed-img">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><line x1="9" y1="22" x2="9" y2="12"/><line x1="15" y1="22" x2="15" y2="12"/></svg>
+          </div>
+          <div class="feed-txt">Bank</div>
+        </div>
+        <div class="feed-div" id="profileBtn">
+          <div class="feed-img">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div class="feed-txt">Profile</div>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { ref, set, getDatabase, push, get,onValue, update, onDisconnect   } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import { onAuthStateChanged, getAuth, createUserWithEmailAndPassword ,signOut} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+
+// Your web app's Firebase configuration
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
+  authDomain: "uamtv-c031c.firebaseapp.com",
+  databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
+  projectId: "uamtv-c031c",
+  storageBucket: "uamtv-c031c.firebasestorage.app",
+  messagingSenderId: "9790917697",
+  appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
+  measurementId: "G-RSXW1XBVQZ"
+};
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase();
+
+// ✅ ADD THIS TEST CODE:
+console.log('🔥 Firebase initialized:', app.name);
+console.log('🔐 Auth ready:', auth.app.name);
+console.log('💾 Database ready:', db.app.name);
+console.log('📍 Database URL:', app.options.databaseURL);
+
+
+onAuthStateChanged(auth, (user) => {
+  if (!user) {
+    window.location.href = "/login/login.html"; // Redirect if not logged in
+  }
+});
+
+
+    // id for footer 
+    const homeBtn = document.getElementById("homeBtn");
+    const chatBtn = document.getElementById("chatBtn");
+    const bankBtn = document.getElementById("bankBtn");
+    const profileBtn = document.getElementById("profileBtn");
+
+
+    // id for sidebar
+
+    const marketBtn = document.getElementById("marketBtn");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const userBtn = document.getElementById("userBtn");
+    const chatSidebareBtn = document.getElementById("chatBtn");
+    const logOutBtn = document.getElementById("logOutBtn");
+    const topUpBtn = document.getElementById("topUpBtn");
+    const settingsBtn = document.getElementById("settingsBtn");
+    const transactionBtn = document.getElementById("transactionBtn");
+    const LivechatBtn = document.getElementById("LivechatBtn");
+
+    // sidebar logic 
+    const sidebar = document.getElementById('sidebar');
+    const openSidebar = document.getElementById('openSidebar');
+    let sidebarOpen = false;
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    // tokens display 
+    let token_amount = document.getElementById("token_amount");
+    
+    openSidebar.addEventListener('click', (e) => {
+      e.stopPropagation();
+      sidebarOpen = !sidebarOpen;
+      if (sidebarOpen) {
+        sidebar.classList.add('active');
+        sidebarOverlay.style.display = 'block';
+      } else {
+        sidebar.classList.remove('active');
+        sidebarOverlay.style.display = 'none';
+      }
+    });
+    
+    sidebarOverlay.addEventListener('click', () => {
+      if (window.innerWidth <= 600 && sidebarOpen) {
+        sidebar.classList.remove('active');
+        sidebarOverlay.style.display = 'none';
+        sidebarOpen = false;
+      }
+    });
+    
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 600) {
+        sidebar.classList.remove('active');
+        sidebarOverlay.style.display = 'none';
+        sidebarOpen = false;
+      }
+    });
+
+   // event listeners for footer buttons
+   
+   homeBtn.addEventListener("click", ()=>{
+    document.getElementById("mainframe").src = "Market/market.html";
+  })
+
+  bankBtn.addEventListener("click", ()=>{
+    document.getElementById("mainframe").src = "Bank/bank.html";
+  });
+
+
+  profileBtn.addEventListener("click", ()=>{
+    document.getElementById("mainframe").src = "profile/profile.html";
+  })
+
+
+  // events for sidebar buttons
+
+  marketBtn.addEventListener("click", ()=>{
+    document.getElementById("mainframe").src = "Market/market.html";
+  });
+
+  uploadBtn.addEventListener("click", ()=>{
+    document.getElementById("mainframe").src = "Host/host.html";
+  });
+
+  userBtn.addEventListener("click", ()=>{
+    document.getElementById("mainframe").src = "Users/users.html";
+  });
+
+  chatSidebareBtn.addEventListener("click",()=>{
+    document.getElementById("mainframe").src = "Chats/chats.html";
+  });
+  topUpBtn.addEventListener('click', ()=>{
+    document.getElementById("mainframe").src = "Top-up/top-up.html";
+  });
+  transactionBtn.addEventListener("click",  ()=>{
+    document.getElementById("mainframe").src = "Transactions/transactions.html";
+  });
+
+  settingsBtn.addEventListener('click', ()=>{
+    document.getElementById("mainframe").src = "Settings/settings.html";
+  });
+  LivechatBtn.addEventListener("click", ()=>{
+    document.getElementById("mainframe").src = 'live_Chat/live.html';
+  })
+
+
+  logOutBtn.addEventListener("click", async () => {
+    const confirmLogout = confirm("Are you sure you want to logout?");
+    if (!confirmLogout) return;
+  
+    try {
+      const user = auth.currentUser;
+  
+      if (user) {
+        await update(ref(db, "users/" + user.uid), {
+          status: "offline",
+        });
+      }
+  
+      await signOut(auth);
+      window.location.href = "/login/login.html";
+    } catch (error) {
+      console.error("Logout failed:", error);
+      alert("Something went wrong while logging out.");
+    }
+  });
+  
+  onAuthStateChanged(auth, (user)=>{
+    if(user){
+      const userId = user.uid;
+      const userRef = ref(db, "users/" + userId);
+
+      // 🟢 Update online status
+      const connectedRef = ref(db, ".info/connected");
+      onValue(connectedRef, (snap) => {
+        if (snap.val() === true) {
+          update(userRef, { status: "online" });
+          onDisconnect(userRef).update({ status: "offline" });
+        }
+      });
+
+     
+    }
+  })
+
+  // 4. Enhanced status with last seen
+onAuthStateChanged(auth, (user)=>{
+  if(user){
+    const userId = user.uid;
+    const userRef = ref(db, "users/" + userId);
+
+    const connectedRef = ref(db, ".info/connected");
+    onValue(connectedRef, (snap) => {
+      if (snap.val() === true) {
+        update(userRef, { 
+          status: "online",
+          lastSeen: Date.now()
+        });
+        onDisconnect(userRef).update({ 
+          status: "offline",
+          lastSeen: Date.now()
+        });
+      }
+    });
+    // fecth tokens and display
+    onValue(userRef, (snapshot) => {
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        let tokens = userData.tokens || 0;
+        token_amount.textContent = tokens;
+      } else {
+        console.log("No user data found");
+      }
+    }, (error) => {
+      console.error("Error fetching user data:", error);
+    });
+    
+   
+  }
+});
+
+
+  
+  
+  </script>
+</body>
+</html>

@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Terminal</title>
+<style>
+    body {
+        background-color: #0a0a0a;
+        color: #00ff9c;
+        font-family: "Courier New", monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+    }
+
+    .terminal {
+        width: 90%;
+        max-width: 700px;
+        background: #111;
+        border-radius: 10px;
+        padding: 20px;
+        border: 1px solid #00ff7f44;
+        box-shadow: 0 0 22px #00ff7f22;
+        margin-top:-11%;
+    }
+
+    .terminal h2 {
+        margin-top: 0;
+        color: #00ff9c;
+    }
+
+    .balance-panel {
+        background: linear-gradient(135deg, #00ff7f22, #00ff7f11);
+        border: 1px solid #00ff7f44;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 15px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 0 15px rgba(0, 255, 127, 0.2);
+    }
+
+    .balance-panel h4 {
+        margin: 0;
+        color: #00ff9c;
+        font-size: 0.9em;
+    }
+
+    .balance-amount {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #00ff7f;
+    }
+
+    .debug-panel {
+        background: #1a1a1a;
+        border: 1px solid #ffaa00;
+        border-radius: 5px;
+        padding: 10px;
+        margin: 10px 0;
+        font-size: 0.85em;
+        color: #ffaa00;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .debug-panel h4 {
+        margin: 0 0 5px 0;
+        color: #ffaa00;
+    }
+
+    .input-section {
+        display: flex;
+        gap: 10px;
+        margin: 15px 0;
+        flex-wrap: wrap;
+    }
+
+    input {
+        flex: 1;
+        min-width: 200px;
+        background: black;
+        border: 1px solid #00ff9c;
+        color: #00ff9c;
+        font-family: inherit;
+        font-size: 1em;
+        padding: 10px;
+        border-radius: 5px;
+        outline: none;
+        box-sizing: border-box;
+    }
+
+    input:focus {
+        box-shadow: 0 0 10px #00ff9c;
+    }
+
+    input:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .output {
+        margin-top: 20px;
+        padding: 15px;
+        border-top: 1px solid #00ff9c;
+        min-height: 50px;
+    }
+
+    .product-card {
+        background: #12121a;
+        border-radius: 12px;
+        border: 1px solid rgba(0, 255, 127, 0.3);
+        box-shadow: 0 0 15px rgba(0, 255, 127, 0.15);
+        padding: 12px;
+        display: flex;
+        gap: 15px;
+        align-items: flex-start;
+        transition: all 0.3s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 0 25px rgba(0, 255, 127, 0.3);
+        border-color: rgba(0, 255, 127, 0.6);
+    }
+
+    .product-img-container {
+        flex-shrink: 0;
+    }
+
+    .product-img {
+        width: 140px;
+        height: 140px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #00ff7f44;
+        box-shadow: 0 0 10px #00ff7f22;
+    }
+
+    .product-info {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        flex: 1;
+    }
+
+    .product-title h3 {
+        font-size: 1.1em;
+        color: #00ff9c;
+        margin: 0;
+        min-height: 1.3em;
+    }
+
+    .product-details {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .price {
+        font-weight: bold;
+        color: #00ff7f;
+        font-size: 0.95em;
+        min-height: 1.2em;
+    }
+
+    .product-id {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #888;
+        font-size: 0.9em;
+        min-height: 1.2em;
+    }
+
+    .copy-icon {
+        cursor: pointer;
+        color: #00ff7f;
+        transition: 0.2s;
+    }
+
+    .copy-icon:hover {
+        color: #00ffff;
+    }
+
+    .error {
+        color: #ff3c3c;
+        background: #ff3c3c11;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ff3c3c44;
+    }
+
+    .success {
+        color: #00ff9c;
+        background: #00ff9c11;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #00ff9c44;
+    }
+
+    .warning {
+        color: #ffaa00;
+        background: #ffaa0011;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ffaa0044;
+    }
+
+    .terminal button {
+        background: none;
+        color: #00ff9c;
+        border: 1px solid #00ff7f44;
+        border-radius: 8px;
+        padding: 8px 16px;
+        cursor: pointer;
+        box-shadow: 0 0 15px #00ff7f22;
+        transition: all 0.3s ease;
+        font-family: inherit;
+        font-size: 0.9em;
+    }
+
+    .terminal button:hover {
+        box-shadow: 0 0 25px #00ff7f44;
+        border-color: #00ff7f66;
+        background: #00ff7f11;
+    }
+
+    .terminal button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .typewriter {
+        min-height: 1.2em;
+    }
+
+    .typewriter.typing {
+        border-right: 2px solid #00ff9c;
+        padding-right: 4px;
+        animation: blinkCursor 0.7s step-end infinite;
+    }
+
+    @keyframes blinkCursor {
+        50% { border-right-color: transparent; }
+    }
+
+    .loading {
+        color: #00ff9c;
+        animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+    }
+
+    @media (max-width: 600px) {
+        .terminal {
+            max-width: 100%;
+        }
+
+        .product-card {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .product-img {
+            width: 120px;
+            height: 120px;
+        }
+
+        .input-section {
+            flex-direction: column;
+        }
+
+        input {
+            min-width: 100%;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="terminal">
+    <h2>🛒 Product Terminal</h2>
+    
+    <!-- <div class="balance-panel">
+        <h4>💰 Your Balance</h4>
+        <div class="balance-amount" id="balanceDisplay">-- 🪙</div>
+    </div> -->
+    
+    <div class="debug-panel" id="debugPanel">
+        <h4>🔍 System Status:</h4>
+        <div id="debugContent">Initializing...</div>
+    </div>
+
+    <p>Enter Tool ID and press Enter:</p>
+    
+    <div class="input-section">
+        <input type="text" id="productInput" placeholder="e.g. KS84X5X">
+        <button type="button" id="searchBtn">Search</button>
+        <button type="button" id="testBtn">Test Connection</button>
+    </div>
+    
+    <div class="output" id="output"></div>
+
+    <hr style="border: 1px solid #00ff7f44; margin: 20px 0;">
+    
+    <p>💳 Complete Purchase:</p>
+    <div class="input-section">
+        <input type="text" id="productIdForPurchase" placeholder="Product ID" disabled>
+        <button type="button" id="purchaseBtn">Purchase 🛒</button>
+    </div>
+</div>
+<div class="null" style="height: 70px;"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getDatabase, ref, get, child, push, set, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
+  authDomain: "uamtv-c031c.firebaseapp.com",
+  databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
+  projectId: "uamtv-c031c",
+  storageBucket: "uamtv-c031c.firebasestorage.app",
+  messagingSenderId: "9790917697",
+  appId: "1:9790917697:web:275c8347b7688e0ac38ac0"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+const auth = getAuth(app);
+
+const debugContent = document.getElementById('debugContent');
+const balanceDisplay = document.getElementById('balanceDisplay');
+const input = document.getElementById("productInput");
+const output = document.getElementById("output");
+const searchBtn = document.getElementById("searchBtn");
+const testBtn = document.getElementById("testBtn");
+const purchaseBtn = document.getElementById("purchaseBtn");
+const productIdForPurchase = document.getElementById("productIdForPurchase");
+let debugLog = [];
+let currentUser = null;
+let userTokens = 0;
+let currentTypewriterTimeout;
+let currentProduct = null;
+let currentPrice = null;
+
+function addDebug(msg) {
+    const time = new Date().toLocaleTimeString();
+    debugLog.push(`[${time}] ${msg}`);
+    if (debugLog.length > 15) debugLog.shift();
+    debugContent.innerHTML = debugLog.join('<br>');
+    console.log(msg);
+}
+
+function updateBalanceDisplay() {
+    balanceDisplay.textContent = `${userTokens} 🪙`;
+}
+
+addDebug('🔥 Database initialized');
+
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        addDebug(`✅ User logged in: ${user.email}`);
+        await loadUserBalance(user.uid);
+    } else {
+        addDebug('⚠️ No user logged in');
+        balanceDisplay.textContent = '-- 🪙';
+        output.innerHTML = `<p class="error">❌ Please log in to make purchases</p>`;
+        purchaseBtn.disabled = true;
+    }
+});
+
+async function loadUserBalance(userId) {
+    try {
+        const userRef = ref(db, `users/${userId}`);
+        const snapshot = await get(userRef);
+        
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            userTokens = userData.tokens || 0;
+            updateBalanceDisplay();
+            addDebug(`💰 Balance loaded: ${userTokens} tokens`);
+        } else {
+            userTokens = 0;
+            updateBalanceDisplay();
+            addDebug('⚠️ No user data found, balance set to 0');
+        }
+    } catch (error) {
+        addDebug(`❌ Error loading balance: ${error.message}`);
+    }
+}
+
+function typewriterEffect(element, text, speed = 50, callback = null) {
+    clearTimeout(currentTypewriterTimeout);
+    element.textContent = '';
+    element.classList.add('typing');
+    
+    let index = 0;
+
+    function type() {
+        if (index < text.length) {
+            element.textContent += text.charAt(index);
+            index++;
+            currentTypewriterTimeout = setTimeout(type, speed);
+        } else {
+            element.classList.remove('typing');
+            if (callback) callback();
+        }
+    }
+
+    type();
+}
+
+async function testConnection() {
+    addDebug('🧪 Testing Firebase connection...');
+    testBtn.disabled = true;
+    
+    try {
+        const toolsRef = ref(db, 'tools');
+        addDebug('📡 Attempting to read tools node...');
+        
+        const snapshot = await get(toolsRef);
+        
+        if (snapshot.exists()) {
+            const tools = snapshot.val();
+            const toolCount = Object.keys(tools).length;
+            addDebug(`✅ Connected! Found ${toolCount} tools in database`);
+            
+            const toolIds = Object.entries(tools).slice(0, 3).map(([key, tool]) => tool.toolId || 'no-toolId');
+            addDebug(`📋 Sample tool IDs: ${toolIds.join(', ')}`);
+            
+            output.innerHTML = `<p class="success">✅ Connection successful! Found ${toolCount} products available for purchase.</p>`;
+        } else {
+            addDebug('⚠️ No "tools" node found in database');
+            output.innerHTML = `<p class="error">⚠️ Database connected but no "tools" data found.</p>`;
+        }
+    } catch (error) {
+        addDebug(`❌ Error: ${error.message}`);
+        addDebug(`❌ Error code: ${error.code || 'unknown'}`);
+        output.innerHTML = `<p class="error">❌ Connection failed: ${error.message}</p>`;
+    }
+    
+    testBtn.disabled = false;
+}
+
+async function checkProductId(toolId) {
+  try {
+    addDebug(`🔍 Searching for toolId: "${toolId}"`);
+    const toolsRef = ref(db, 'tools');
+    const snapshot = await get(toolsRef);
+
+    if (!snapshot.exists()) {
+      addDebug(`❌ Tools node is empty or doesn't exist`);
+      return null;
+    }
+
+    const toolsData = snapshot.val();
+    let totalTools = 0;
+    
+    for (const [userKey, userTools] of Object.entries(toolsData)) {
+      addDebug(`📂 Checking user folder: ${userKey}`);
+      
+      if (typeof userTools === 'object' && userTools !== null) {
+        for (const [toolKey, tool] of Object.entries(userTools)) {
+          totalTools++;
+          addDebug(`🔎 Checking tool: ${toolKey}, toolId: ${tool.toolId || 'no toolId'}`);
+          
+          if (tool.toolId && tool.toolId.toString().trim().toLowerCase() === toolId.toLowerCase()) {
+            addDebug(`✅ Match found! Tool: ${tool.name}, Seller: ${userKey}`);
+            return { ...tool, firebaseKey: toolKey, sellerId: userKey };
+          }
+        }
+      }
+    }
+    
+    addDebug(`📦 Searched through ${totalTools} total tools`);
+    addDebug(`❌ No match found for toolId: "${toolId}"`);
+    return null;
+    
+  } catch (error) {
+    addDebug(`❌ Error searching: ${error.message}`);
+    console.error("Full error details:", error);
+    return null;
+  }
+}
+
+function displayProductWithTypewriter(product, id) {
+    currentProduct = { ...product, id };
+    currentPrice = parseFloat(product.price) || 0;
+    
+    const imgUrl = product.image || 'https://via.placeholder.com/140?text=No+Image';
+    
+    output.innerHTML = `
+        <div class="product-card">
+            <div class="product-img-container">
+                <img src="${imgUrl}" class="product-img" alt="${product.name || 'Product'}" onerror="this.src='https://via.placeholder.com/140?text=Image+Error'">
+            </div>
+            <div class="product-info">
+                <div class="product-title">
+                    <h3 class="typewriter" id="productName"></h3>
+                </div>
+                <div class="product-details">
+                    <span class="price typewriter" id="productPrice"></span>
+                    <div class="product-id">
+                        <span class="typewriter" id="productId"></span>
+                        <span class="copy-icon" title="Copy ID" onclick="navigator.clipboard.writeText('${id}').then(() => alert('Copied: ${id}'))">📋</span>
+                    </div>
+                    <span class="typewriter" id="productDesc" style="color: #888; font-size: 0.85em;"></span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const nameEl = document.getElementById('productName');
+    typewriterEffect(nameEl, product.name || 'Unknown Product', 50, () => {
+        const priceEl = document.getElementById('productPrice');
+        typewriterEffect(priceEl, `Price: ${currentPrice} Tokens`, 40, () => {
+            const idEl = document.getElementById('productId');
+            typewriterEffect(idEl, `#${id}`, 40, () => {
+                if (product.description) {
+                    const descEl = document.getElementById('productDesc');
+                    typewriterEffect(descEl, product.description, 30);
+                }
+            });
+        });
+    });
+}
+
+async function searchProduct() {
+    const id = input.value.trim();
+    
+    if (!id) {
+        output.innerHTML = `<p class="error">❌ Please enter a Product ID</p>`;
+        return;
+    }
+
+    searchBtn.disabled = true;
+    output.innerHTML = `<p class="loading">🔍 Searching for "${id}"...</p>`;
+    addDebug(`🔎 User searching for: "${id}"`);
+    
+    const product = await checkProductId(id);
+    
+    if (product) {
+        displayProductWithTypewriter(product, id);
+        productIdForPurchase.value = id;
+        addDebug(`✅ Product displayed successfully`);
+    } else {
+        output.innerHTML = `
+            <p class="error">❌ Product "${id}" not found.</p>
+            <p class="warning">💡 Tips:</p>
+            <ul style="color: #888; font-size: 0.9em;">
+                <li>Check if the Product ID is correct (case-insensitive)</li>
+                <li>Click "Test Connection" to verify database access</li>
+                <li>Check the debug panel for more details</li>
+            </ul>
+        `;
+        addDebug(`❌ Search failed for: "${id}"`);
+    }
+    
+    searchBtn.disabled = false;
+    input.value = "";
+}
+
+// 🆕 UPDATED PURCHASE FUNCTION WITH SELLER TOKEN TRANSFER
+async function processPurchase() {
+    const productId = productIdForPurchase.value.trim();
+    
+    if (!productId) {
+        output.innerHTML = `<p class="error">❌ Please search for a product first</p>`;
+        return;
+    }
+
+    if (!currentUser) {
+        output.innerHTML = `<p class="error">❌ Please log in to make purchases</p>`;
+        return;
+    }
+
+    purchaseBtn.disabled = true;
+    output.innerHTML = `<p class="loading">🔍 Verifying product and balance...</p>`;
+
+    try {
+        // Get product with seller ID
+        const product = await checkProductId(productId);
+        
+        if (!product) {
+            output.innerHTML = `<p class="error">❌ Invalid Product ID</p>`;
+            purchaseBtn.disabled = false;
+            return;
+        }
+
+        const sellerId = product.sellerId;
+        const productPrice = parseFloat(product.price) || 0;
+        
+        // Check if buying own product
+        if (currentUser.uid === sellerId) {
+            output.innerHTML = `<p class="error">❌ You cannot purchase your own product!</p>`;
+            purchaseBtn.disabled = false;
+            return;
+        }
+
+        // Check if already purchased
+        const purchaseCheckRef = ref(db, `users/${currentUser.uid}/purchasedTools/${productId}`);
+        const purchaseSnapshot = await get(purchaseCheckRef);
+        
+        if (purchaseSnapshot.exists()) {
+            output.innerHTML = `<p class="warning">✅ You already own this product!</p>`;
+            purchaseBtn.disabled = false;
+            return;
+        }
+        
+        // Load buyer's current balance
+        await loadUserBalance(currentUser.uid);
+        
+        addDebug(`💰 Buyer balance: ${userTokens} | Price: ${productPrice}`);
+
+        // Check sufficient balance
+        if (userTokens < productPrice) {
+            const shortage = productPrice - userTokens;
+            output.innerHTML = `
+                <p class="error">❌ Insufficient tokens!</p>
+                <p class="warning">You need ${shortage} more tokens to purchase this product.</p>
+                <p style="color: #888; margin-top: 10px;">
+                    Your balance: ${userTokens} 🪙<br>
+                    Product price: ${productPrice} 🪙
+                </p>
+            `;
+            purchaseBtn.disabled = false;
+            return;
+        }
+
+        output.innerHTML = `<p class="loading">💳 Processing payment and transferring tokens...</p>`;
+
+        // Get seller's current balance
+        const sellerRef = ref(db, `users/${sellerId}`);
+        const sellerSnapshot = await get(sellerRef);
+        
+        if (!sellerSnapshot.exists()) {
+            output.innerHTML = `<p class="error">❌ Seller data not found!</p>`;
+            purchaseBtn.disabled = false;
+            return;
+        }
+
+        const sellerBalance = sellerSnapshot.val().tokens || 0;
+
+        // Calculate new balances
+        const newBuyerBalance = userTokens - productPrice;
+        const newSellerBalance = sellerBalance + productPrice;
+
+        addDebug(`💸 Transfer: ${productPrice} tokens from buyer to seller`);
+        addDebug(`👤 Buyer: ${userTokens} → ${newBuyerBalance}`);
+        addDebug(`👤 Seller: ${sellerBalance} → ${newSellerBalance}`);
+
+        // Create transaction record
+        const transactionId = push(ref(db, 'transactions')).key;
+        const timestamp = Date.now();
+
+        const transactionData = {
+            transactionId: transactionId,
+            type: 'purchase',
+            toolId: productId,
+            toolName: product.name,
+            amount: productPrice,
+            buyerId: currentUser.uid,
+            buyerEmail: currentUser.email,
+            sellerId: sellerId,
+            timestamp: timestamp,
+            status: 'completed'
+        };
+
+        // Prepare atomic updates
+        const updates = {};
+        
+        // Update buyer's balance
+        updates[`users/${currentUser.uid}/tokens`] = newBuyerBalance;
+        
+        // Add to buyer's purchased tools
+        updates[`users/${currentUser.uid}/purchasedTools/${productId}`] = {
+            purchasedAt: timestamp,
+            price: productPrice,
+            sellerId: sellerId,
+            toolName: product.name,
+            downloadEnabled: true
+        };
+        
+        // Update seller's balance (THIS IS THE KEY!)
+        updates[`users/${sellerId}/tokens`] = newSellerBalance;
+        
+        // Add to seller's sales record
+        updates[`users/${sellerId}/sales/${transactionId}`] = {
+            toolId: productId,
+            toolName: product.name,
+            buyerId: currentUser.uid,
+            buyerEmail: currentUser.email,
+            amount: productPrice,
+            timestamp: timestamp
+        };
+        
+        // Store transaction in buyer's history
+        updates[`users/${currentUser.uid}/transactions/${transactionId}`] = transactionData;
+        
+        // Store transaction in seller's history
+        updates[`users/${sellerId}/transactions/${transactionId}`] = transactionData;
+        
+        // Store in global transactions
+        updates[`transactions/${transactionId}`] = transactionData;
+
+        // Execute all updates atomically
+        await update(ref(db), updates);
+
+        // Update local balance
+        userTokens = newBuyerBalance;
+        updateBalanceDisplay();
+        
+        addDebug(`✅ Purchase complete!`);
+        addDebug(`💰 Your new balance: ${newBuyerBalance}`);
+        addDebug(`💰 Seller's new balance: ${newSellerBalance}`);
+
+        output.innerHTML = `<div class="success">
+            <p style="font-size: 1.2em; margin: 0 0 10px 0;">✅ Purchase Complete!</p>
+            <p style="margin: 5px 0;"><strong>${product.name}</strong></p>
+            <p style="margin: 5px 0;">💸 ${productPrice} tokens transferred to seller</p>
+            <p style="margin: 5px 0;">💰 Your new balance: ${newBuyerBalance} 🪙</p>
+            <p style="margin: 5px 0; color: #888; font-size: 0.9em;">Transaction ID: ${transactionId}</p>
+        </div>`;
+        
+        productIdForPurchase.value = "";
+        currentProduct = null;
+        currentPrice = null;
+    } catch (error) {
+        addDebug(`❌ Purchase error: ${error.message}`);
+        output.innerHTML = `<p class="error">❌ Purchase failed: ${error.message}</p>`;
+    }
+    
+    purchaseBtn.disabled = false;
+}
+
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") searchProduct();
+});
+
+searchBtn.addEventListener("click", searchProduct);
+testBtn.addEventListener("click", testConnection);
+purchaseBtn.addEventListener("click", processPurchase);
+
+output.innerHTML = `<p style="color: #888;">💡 Click "Test Connection" to verify database access</p>`;
+</script>
+
+</body>
+</html>

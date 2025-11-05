@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - BlackBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Reusing common styles from the profile page for consistent design */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex; /* Added for centering content */
+            justify-content: center; /* Added for centering content */
+            align-items: center; /* Added for centering content */
+            overflow-x: hidden;
+            padding: 20px; /* Added padding for small screens */
+        }
+
+        .container {
+            max-width: 600px; /* Smaller max-width for focused content */
+            margin: 0 auto;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+        }
+
+        .community-card {
+            background: linear-gradient(135deg, #1a1a1a, #141414);
+            border: 1px solid #2a2a2a;
+            border-radius: 20px;
+            padding: 50px 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .icon-container {
+            margin-bottom: 30px;
+            color: #00ff9c; /* Green accent color */
+        }
+
+        .icon-container svg {
+            width: 80px;
+            height: 80px;
+        }
+
+        .status-message {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+        }
+
+        .sub-message {
+            font-size: 1.1em;
+            color: #999;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .contact-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 14px 25px;
+            background: linear-gradient(135deg, #1a1a1a, #141414);
+             /* Green gradient for CTA */
+            border: none;
+            border-radius: 10px;
+            color:white;
+            font-weight: 700;
+            font-size: 1em;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            text-decoration: none; /* Make it look like a button */
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .contact-btn:hover {
+            background: #1a1a1a;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .contact-btn svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            fill: #000;
+        }
+        
+        @media (max-width: 480px) {
+            .status-message {
+                font-size: 1.5em;
+            }
+
+            .sub-message {
+                font-size: 1em;
+            }
+            
+            .contact-btn {
+                width: 100%;
+                padding: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>BlackBox Community</h1>
+        </div>
+
+        <div class="community-card">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    <path d="M8 10h.01"/>
+                    <path d="M12 10h.01"/>
+                    <path d="M16 10h.01"/>
+                </svg>
+            </div>
+            
+            <p class="status-message">Community Live Chat Coming Soon!</p>
+            <p class="sub-message">We're working hard to bring you a dedicated space to connect, share ideas, and get support. Stay tuned for the official launch!</p>
+            
+            <a href="https://wa.me/+2348141104435?text=Hi%20I%20saw%20the%20community%20page%20and%20wanted%20to%20get%20in%20touch." target="_blank" class="contact-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32" role="img" aria-label="Chat">
+                    <title>Chat outline</title>
+                    <path fill="none" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M21 15a2 2 0 0 1-2 2H8l-5 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                  </svg>
+                  
+                Contact Developer
+            </a>
+        </div>
+    </div>
+</body>
+</html>

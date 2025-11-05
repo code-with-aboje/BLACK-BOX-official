@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BlackBox</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="background-grid"></div>
+
+  <!-- Rotating 3D Box -->
+  <div class="cube">
+    <div class="face front"></div>
+    <div class="face back"></div>
+    <div class="face right"></div>
+    <div class="face left"></div>
+    <div class="face top"></div>
+    <div class="face bottom"></div>
+  </div>
+  <div class="projection"></div>
+  
+  <h1 class="blackbox-title">
+    <span class="black">Black</span><span class="box">Box</span>
+  </h1>
+
+  <p class="intro-text" id="typewriter"></p>
+
+  <button id="enterBtn" >Join blackBox</button>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(black, #050505);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 800px;
+      position: relative;
+    }
+
+    /* Grid background */
+    .background-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: linear-gradient(white 1px, transparent 1px),
+        linear-gradient(90deg, white 1px, transparent 1px);
+      background-size: 80px 80px;
+      opacity: 0.05;
+      z-index: 0;
+    }
+
+    /* 3D cube - responsive sizing */
+    .cube {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: clamp(60px, 15vw, 100px);
+      height: clamp(60px, 15vw, 100px);
+      transform-style: preserve-3d;
+      animation: cube-rotate 10s infinite linear;
+      z-index: 2;
+    }
+
+    .face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: black;
+      border: 2px solid white;
+      box-shadow: 0 0 20px white;
+      color: white;
+    }
+
+    .front  { transform: translateZ(calc(clamp(60px, 15vw, 100px) / 2)); }
+    .back   { transform: rotateY(180deg) translateZ(calc(clamp(60px, 15vw, 100px) / 2)); }
+    .right  { transform: rotateY(90deg) translateZ(calc(clamp(60px, 15vw, 100px) / 2)); }
+    .left   { transform: rotateY(-90deg) translateZ(calc(clamp(60px, 15vw, 100px) / 2)); }
+    .top    { transform: rotateX(90deg) translateZ(calc(clamp(60px, 15vw, 100px) / 2)); }
+    .bottom { transform: rotateX(-90deg) translateZ(calc(clamp(60px, 15vw, 100px) / 2)); }
+
+    @keyframes cube-rotate {
+      0% { transform: translateX(-50%) rotateX(0) rotateY(0); }
+      25% { transform: translateX(-50%) rotateX(90deg) rotateY(180deg); }
+      50% { transform: translateX(-50%) rotateX(180deg) rotateY(270deg); }
+      75% { transform: translateX(-50%) rotateX(270deg) rotateY(90deg); }
+      100% { transform: translateX(-50%) rotateX(360deg) rotateY(360deg); }
+    }
+
+    /* Projection light beam */
+    .projection {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      width: clamp(100px, 30vw, 220px);
+      height: clamp(100px, 30vw, 220px);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.5) 0%, transparent 80%);
+      transform: translate(-50%, 0%) rotateX(90deg);
+      filter: blur(50px);
+      opacity: 0.6;
+      animation: beamPulse 2.5s infinite ease-in-out;
+      z-index: 0;
+    }
+
+    @keyframes beamPulse {
+      0%, 100% { opacity: 0.4; transform: translate(-50%, 0%) rotateX(90deg) scale(1); }
+      50% { opacity: 0.8; transform: translate(-50%, 0%) rotateX(90deg) scale(1.2); }
+    }
+
+    /* Title - responsive sizing */
+    .blackbox-title {
+      font-family: 'Orbitron', sans-serif;
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(32px, 8vw, 60px);
+      font-weight: 900;
+      letter-spacing: clamp(1px, 0.3vw, 3px);
+      text-transform: uppercase;
+      text-align: center;
+      z-index: 3;
+    }
+
+    .blackbox-title .black {
+      color: #b1b2be;
+      text-shadow:
+        1px 1px 2px #333,
+        2px 2px 4px #222,
+        3px 3px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .blackbox-title .box {
+      color: #00ff7f;
+      text-shadow:
+        1px 1px 2px #007a3d,
+        2px 2px 4px #006633,
+        3px 3px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    /* Typewriter intro text - responsive */
+    .intro-text {
+      position: absolute;
+      top: 58%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: clamp(14px, 3vw, 18px);
+      color: #bfbfbf;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: clamp(0.5px, 0.15vw, 1px);
+      text-align: center;
+      width: 90%;
+      max-width: 500px;
+      white-space: pre-line;
+      border-right: 3px solid #00ff7f;
+      animation: blinkCursor 0.7s steps(1) infinite;
+      z-index: 3;
+      padding: 0 15px;
+    }
+
+    @keyframes blinkCursor {
+      50% { border-color: transparent; }
+    }
+
+    /* Button - responsive */
+    #enterBtn {
+      display: none;
+      position: absolute;
+      top: 75%;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: clamp(10px, 2vw, 12px) clamp(20px, 4vw, 28px);
+      font-size: clamp(14px, 3vw, 18px);
+      font-weight: bold;
+      color: #00ff7f;
+      background: transparent;
+      border: 2px solid #00ff7f;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s, color 0.3s;
+      font-family: 'Orbitron', sans-serif;
+      z-index: 3;
+      white-space: nowrap;
+    }
+
+    #enterBtn:hover {
+      transform: translateX(-50%) scale(1.05);
+      background: rgba(0, 255, 127, 0.1);
+      color: #00ffcc;
+    }
+
+    /* Tablet adjustments */
+    @media (max-width: 768px) {
+      .cube {
+        top: 18%;
+      }
+
+      .projection {
+        top: 18%;
+      }
+
+      .blackbox-title {
+        top: 42%;
+      }
+
+      .intro-text {
+        top: 55%;
+        width: 85%;
+      }
+
+      #enterBtn {
+        top: 72%;
+      }
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 480px) {
+      body {
+        perspective: 600px;
+      }
+
+      .background-grid {
+        background-size: 40px 40px;
+      }
+
+      .cube {
+        top: 15%;
+      }
+
+      .projection {
+        top: 15%;
+      }
+
+      .blackbox-title {
+        top: 38%;
+        width: 90%;
+      }
+
+      .intro-text {
+        top: 52%;
+        width: 85%;
+        line-height: 1.5;
+      }
+
+      #enterBtn {
+        top: 70%;
+        width: auto;
+        max-width: 80%;
+      }
+    }
+
+    /* Very small mobile devices */
+    @media (max-width: 360px) {
+      .cube {
+        top: 12%;
+      }
+
+      .blackbox-title {
+        top: 35%;
+      }
+
+      .intro-text {
+        top: 50%;
+        font-size: 12px;
+      }
+
+      #enterBtn {
+        top: 68%;
+      }
+    }
+
+    /* Landscape mobile orientation */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .cube {
+        top: 10%;
+        width: clamp(40px, 8vw, 60px);
+        height: clamp(40px, 8vw, 60px);
+      }
+
+      .blackbox-title {
+        top: 35%;
+        font-size: clamp(24px, 6vw, 40px);
+      }
+
+      .intro-text {
+        top: 52%;
+        font-size: clamp(11px, 2vw, 14px);
+      }
+
+      #enterBtn {
+        top: 75%;
+        padding: 8px 16px;
+        font-size: clamp(12px, 2.5vw, 14px);
+      }
+    }
+  </style>
+
+  <script type="module">
+    import { initializeApp} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getDatabase} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import{onAuthStateChanged, getAuth} from  "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+    
+    // Your web app's Firebase configuration
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
+      authDomain: "uamtv-c031c.firebaseapp.com",
+      databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
+      projectId: "uamtv-c031c",
+      storageBucket: "uamtv-c031c.firebasestorage.app",
+      messagingSenderId: "9790917697",
+      appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
+      measurementId: "G-RSXW1XBVQZ"
+    };
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db =  getDatabase();
+
+console.log('🔥 Firebase initialized:', app.name);
+console.log('🔐 Auth ready:', auth.app.name);
+console.log('💾 Database ready:', db.app.name);
+
+    const textParts = [
+      'Shadows move in code...\nEnter BlackBox — where ',
+      '<span style="color:red;">secrets</span>',
+      ' become power...\n built by devs for devs'
+    ];
+
+    let partIndex = 0;
+    const element = document.getElementById("typewriter");
+    const btn = document.getElementById("enterBtn");
+    const speed = 80;
+    const enterBtn = document.getElementById('enterBtn');
+    function typeEffect() {
+      if (partIndex < textParts.length) {
+        const part = textParts[partIndex];
+
+        if (/<.*?>/.test(part)) {
+          element.innerHTML += part;
+          partIndex++;
+          setTimeout(typeEffect, speed);
+        } else {
+          let charIndex = 0;
+          function typeChar() {
+            if (charIndex < part.length) {
+              element.innerHTML += part.charAt(charIndex);
+              charIndex++;
+              setTimeout(typeChar, speed);
+            } else {
+              partIndex++;
+              setTimeout(typeEffect, speed);
+            }
+          }
+          typeChar();
+        }
+      } else {
+        element.style.borderRight = "none";
+        btn.style.display = "inline-block";
+      }
+    }
+
+    window.onload = () => setTimeout(typeEffect, 1000);
+
+    enterBtn.addEventListener('click', ()=>{
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          // User is already logged in, redirect to homepage
+          console.log('User already logged in:', user.uid);
+          window.location.href = '../homepage.html'; // Change to your homepage path
+        }else{
+          window.location.href = "sign-up.html";
+        }
+      });
+     
+    })
+    // ✅ Check if user is already logged in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is already logged in, redirect to homepage
+        console.log('User already logged in:', user.uid);
+        window.location.href = '../homepage.html'; // Change to your homepage path
+      }else{
+        console.log("no user found, stay on landing page");
+      }
+    });
+  </script>
+</body>
+</html>
