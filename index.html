@@ -27,7 +27,11 @@
   <p class="intro-text" id="typewriter"></p>
 
   <button id="enterBtn" >Join blackBox</button>
+<div class="already-account">
+  <p>Already have an account? <a href="Login/login.html">Login</a></p>
+</div>
 
+  
   <style>
     * {
       margin: 0;
@@ -303,6 +307,28 @@
         font-size: clamp(12px, 2.5vw, 14px);
       }
     }
+
+        .already-account {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: #555;
+  position:absolute;
+  bottom:50px;
+
+}
+
+.already-account a {
+  color: #ff6b81; /* accent pink */
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.already-account a:hover {
+  color: #ff3366;
+  text-decoration: underline;
+}
   </style>
 
   <script type="module">
