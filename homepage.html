@@ -392,6 +392,100 @@
       width: 100%;
     }
 
+    /* Chat Modal Styles */
+    .chat-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .chat-modal-overlay.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    .chat-modal-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #0a0a0a;
+    }
+
+    .chat-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #1a1a1a, #141414);
+      border-bottom: 1px solid #2a2a2a;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .chat-modal-title {
+      font-size: 1.5em;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+
+    .chat-modal-close {
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .chat-modal-close:hover {
+      background: rgba(255, 0, 80, 0.15);
+      border-color: #ff0050;
+      transform: rotate(90deg);
+    }
+
+    .chat-modal-close svg {
+      width: 24px;
+      height: 24px;
+      color: #888;
+    }
+
+    .chat-modal-close:hover svg {
+      color: #ff0050;
+    }
+
+    .chat-modal-content {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .chat-modal-content iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
     @media (max-width: 600px) {
       .sidebar {
         width: 180px;
@@ -434,6 +528,20 @@
       .feed-txt {
         font-size: 0.7em;
       }
+      .chat-modal-header {
+        padding: 16px 20px;
+      }
+      .chat-modal-title {
+        font-size: 1.2em;
+      }
+      .chat-modal-close {
+        width: 40px;
+        height: 40px;
+      }
+      .chat-modal-close svg {
+        width: 20px;
+        height: 20px;
+      }
     }
    @media(max-width:600px){
     #mainframe{
@@ -463,6 +571,24 @@
   <div class="background-grid"></div>
   <div class="sidebar-overlay" id="sidebarOverlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; z-index:1000; background:rgba(0,0,0,0.6);"></div>
   
+  <!-- Chat Modal -->
+  <div class="chat-modal-overlay" id="chatModal">
+    <div class="chat-modal-container">
+      <div class="chat-modal-header">
+        <div class="chat-modal-title">Messages</div>
+        <button class="chat-modal-close" id="closeChatModal">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-modal-content">
+        <iframe id="chatFrame" src=""></iframe>
+      </div>
+    </div>
+  </div>
+
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
@@ -571,7 +697,7 @@
           </div>
           <div class="feed-txt">Bank</div>
         </div>
-        <div class="feed-div" id="profileBtn">
+          <div class="feed-div" id="profileBtn">
           <div class="feed-img">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
@@ -583,11 +709,8 @@
 
   <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-import { ref, set, getDatabase, push, get,onValue, update, onDisconnect   } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
-import { onAuthStateChanged, getAuth, createUserWithEmailAndPassword ,signOut} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-
-
-// Your web app's Firebase configuration
+import { ref, set, getDatabase, push, get, onValue, update, onDisconnect } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import { onAuthStateChanged, getAuth, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
@@ -599,171 +722,194 @@ const firebaseConfig = {
   appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
   measurementId: "G-RSXW1XBVQZ"
 };
-// Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getDatabase();
 
-// ✅ ADD THIS TEST CODE:
 console.log('🔥 Firebase initialized:', app.name);
 console.log('🔐 Auth ready:', auth.app.name);
 console.log('💾 Database ready:', db.app.name);
 console.log('📍 Database URL:', app.options.databaseURL);
 
-
 onAuthStateChanged(auth, (user) => {
   if (!user) {
-    window.location.href = "/login/login.html"; // Redirect if not logged in
+    window.location.href = "/login/login.html";
   }
 });
 
+// Get elements
+const homeBtn = document.getElementById("homeBtn");
+const chatBtn = document.getElementById("chatBtn");
+const bankBtn = document.getElementById("bankBtn");
+const profileBtn = document.getElementById("profileBtn");
+const marketBtn = document.getElementById("marketBtn");
+const uploadBtn = document.getElementById("uploadBtn");
+const userBtn = document.getElementById("userBtn");
+const chatSidebareBtn = document.getElementById("chatBtn");
+const logOutBtn = document.getElementById("logOutBtn");
+const topUpBtn = document.getElementById("topUpBtn");
+const settingsBtn = document.getElementById("settingsBtn");
+const transactionBtn = document.getElementById("transactionBtn");
+const LivechatBtn = document.getElementById("LivechatBtn");
 
-    // id for footer 
-    const homeBtn = document.getElementById("homeBtn");
-    const chatBtn = document.getElementById("chatBtn");
-    const bankBtn = document.getElementById("bankBtn");
-    const profileBtn = document.getElementById("profileBtn");
+// Chat modal elements
+const chatModal = document.getElementById("chatModal");
+const closeChatModal = document.getElementById("closeChatModal");
+const chatFrame = document.getElementById("chatFrame");
 
+// Sidebar logic
+const sidebar = document.getElementById('sidebar');
+const openSidebar = document.getElementById('openSidebar');
+let sidebarOpen = false;
+const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    // id for sidebar
+// Tokens display
+let token_amount = document.getElementById("token_amount");
 
-    const marketBtn = document.getElementById("marketBtn");
-    const uploadBtn = document.getElementById("uploadBtn");
-    const userBtn = document.getElementById("userBtn");
-    const chatSidebareBtn = document.getElementById("chatBtn");
-    const logOutBtn = document.getElementById("logOutBtn");
-    const topUpBtn = document.getElementById("topUpBtn");
-    const settingsBtn = document.getElementById("settingsBtn");
-    const transactionBtn = document.getElementById("transactionBtn");
-    const LivechatBtn = document.getElementById("LivechatBtn");
+// Open chat modal function
+function openChatModal() {
+  chatModal.classList.add('active');
+  chatFrame.src = "Chats/chats.html";
+  document.body.style.overflow = 'hidden';
+}
 
-    // sidebar logic 
-    const sidebar = document.getElementById('sidebar');
-    const openSidebar = document.getElementById('openSidebar');
-    let sidebarOpen = false;
-    const sidebarOverlay = document.getElementById('sidebarOverlay');
+// Close chat modal function
+function closeChatModalFunc() {
+  chatModal.classList.remove('active');
+  chatFrame.src = "";
+  document.body.style.overflow = '';
+}
 
-    // tokens display 
-    let token_amount = document.getElementById("token_amount");
-    
-    openSidebar.addEventListener('click', (e) => {
-      e.stopPropagation();
-      sidebarOpen = !sidebarOpen;
-      if (sidebarOpen) {
-        sidebar.classList.add('active');
-        sidebarOverlay.style.display = 'block';
-      } else {
-        sidebar.classList.remove('active');
-        sidebarOverlay.style.display = 'none';
-      }
-    });
-    
-    sidebarOverlay.addEventListener('click', () => {
-      if (window.innerWidth <= 600 && sidebarOpen) {
-        sidebar.classList.remove('active');
-        sidebarOverlay.style.display = 'none';
-        sidebarOpen = false;
-      }
-    });
-    
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 600) {
-        sidebar.classList.remove('active');
-        sidebarOverlay.style.display = 'none';
-        sidebarOpen = false;
-      }
-    });
+// Chat modal event listeners
+closeChatModal.addEventListener('click', closeChatModalFunc);
 
-   // event listeners for footer buttons
-   
-   homeBtn.addEventListener("click", ()=>{
-    document.getElementById("mainframe").src = "Market/market.html";
-  })
+chatModal.addEventListener('click', (e) => {
+  if (e.target === chatModal) {
+    closeChatModalFunc();
+  }
+});
 
-  bankBtn.addEventListener("click", ()=>{
-    document.getElementById("mainframe").src = "Bank/bank.html";
-  });
+// Escape key to close modal
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && chatModal.classList.contains('active')) {
+    closeChatModalFunc();
+  }
+});
 
+openSidebar.addEventListener('click', (e) => {
+  e.stopPropagation();
+  sidebarOpen = !sidebarOpen;
+  if (sidebarOpen) {
+    sidebar.classList.add('active');
+    sidebarOverlay.style.display = 'block';
+  } else {
+    sidebar.classList.remove('active');
+    sidebarOverlay.style.display = 'none';
+  }
+});
 
-  profileBtn.addEventListener("click", ()=>{
-    document.getElementById("mainframe").src = "profile/profile.html";
-  })
+sidebarOverlay.addEventListener('click', () => {
+  if (window.innerWidth <= 600 && sidebarOpen) {
+    sidebar.classList.remove('active');
+    sidebarOverlay.style.display = 'none';
+    sidebarOpen = false;
+  }
+});
 
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 600) {
+    sidebar.classList.remove('active');
+    sidebarOverlay.style.display = 'none';
+    sidebarOpen = false;
+  }
+});
 
-  // events for sidebar buttons
+// Footer button events
+homeBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = "Market/market.html";
+});
 
-  marketBtn.addEventListener("click", ()=>{
-    document.getElementById("mainframe").src = "Market/market.html";
-  });
+bankBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = "Bank/bank.html";
+});
 
-  uploadBtn.addEventListener("click", ()=>{
-    document.getElementById("mainframe").src = "Host/host.html";
-  });
+profileBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = "profile/profile.html";
+});
 
-  userBtn.addEventListener("click", ()=>{
-    document.getElementById("mainframe").src = "Users/users.html";
-  });
+// Sidebar button events
+marketBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = "Market/market.html";
+});
 
-  chatSidebareBtn.addEventListener("click",()=>{
-    document.getElementById("mainframe").src = "Chats/chats.html";
-  });
-  topUpBtn.addEventListener('click', ()=>{
-    document.getElementById("mainframe").src = "Top-up/top-up.html";
-  });
-  transactionBtn.addEventListener("click",  ()=>{
-    document.getElementById("mainframe").src = "Transactions/transactions.html";
-  });
+uploadBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = "Host/host.html";
+});
 
-  settingsBtn.addEventListener('click', ()=>{
-    document.getElementById("mainframe").src = "Settings/settings.html";
-  });
-  LivechatBtn.addEventListener("click", ()=>{
-    document.getElementById("mainframe").src = 'Live_Chat/live.html';
-  })
+userBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = "Users/users.html";
+});
 
+// Open chat in modal instead of iframe
+chatSidebareBtn.addEventListener("click", () => {
+  openChatModal();
+});
 
-  logOutBtn.addEventListener("click", async () => {
-    const confirmLogout = confirm("Are you sure you want to logout?");
-    if (!confirmLogout) return;
-  
-    try {
-      const user = auth.currentUser;
-  
-      if (user) {
-        await update(ref(db, "users/" + user.uid), {
-          status: "offline",
-        });
-      }
-  
-      await signOut(auth);
-      window.location.href = "/login/login.html";
-    } catch (error) {
-      console.error("Logout failed:", error);
-      alert("Something went wrong while logging out.");
-    }
-  });
-  
-  onAuthStateChanged(auth, (user)=>{
-    if(user){
-      const userId = user.uid;
-      const userRef = ref(db, "users/" + userId);
+topUpBtn.addEventListener('click', () => {
+  document.getElementById("mainframe").src = "Top-up/top-up.html";
+});
 
-      // 🟢 Update online status
-      const connectedRef = ref(db, ".info/connected");
-      onValue(connectedRef, (snap) => {
-        if (snap.val() === true) {
-          update(userRef, { status: "online" });
-          onDisconnect(userRef).update({ status: "offline" });
-        }
+transactionBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = "Transactions/transactions.html";
+});
+
+settingsBtn.addEventListener('click', () => {
+  document.getElementById("mainframe").src = "Settings/settings.html";
+});
+
+LivechatBtn.addEventListener("click", () => {
+  document.getElementById("mainframe").src = 'Live_Chat/live.html';
+});
+
+logOutBtn.addEventListener("click", async () => {
+  const confirmLogout = confirm("Are you sure you want to logout?");
+  if (!confirmLogout) return;
+
+  try {
+    const user = auth.currentUser;
+
+    if (user) {
+      await update(ref(db, "users/" + user.uid), {
+        status: "offline",
       });
-
-     
     }
-  })
 
-  // 4. Enhanced status with last seen
-onAuthStateChanged(auth, (user)=>{
-  if(user){
+    await signOut(auth);
+    window.location.href = "/login/login.html";
+  } catch (error) {
+    console.error("Logout failed:", error);
+    alert("Something went wrong while logging out.");
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    const userId = user.uid;
+    const userRef = ref(db, "users/" + userId);
+
+    const connectedRef = ref(db, ".info/connected");
+    onValue(connectedRef, (snap) => {
+      if (snap.val() === true) {
+        update(userRef, { status: "online" });
+        onDisconnect(userRef).update({ status: "offline" });
+      }
+    });
+  }
+});
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
     const userId = user.uid;
     const userRef = ref(db, "users/" + userId);
 
@@ -780,7 +926,7 @@ onAuthStateChanged(auth, (user)=>{
         });
       }
     });
-    // fecth tokens and display
+
     onValue(userRef, (snapshot) => {
       if (snapshot.exists()) {
         const userData = snapshot.val();
@@ -792,14 +938,8 @@ onAuthStateChanged(auth, (user)=>{
     }, (error) => {
       console.error("Error fetching user data:", error);
     });
-    
-   
   }
 });
-
-
-  
-  
   </script>
 </body>
 </html>
