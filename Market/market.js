@@ -663,7 +663,7 @@ onValue(ref(db, "tools"), async (snapshot) => {
         
         btn_download.addEventListener('click', async () => {
           //alert(`Downloading ${tool_name}...`);
-          window.location.href = `${download}`;
+          window.open(download, "_blank");
           
           try {
             const toolPath = tool.key;
