@@ -342,6 +342,7 @@ onValue(ref(db, "tools"), async (snapshot) => {
       const tool_id = tool.toolId;
       const sellerId = tool.sellerId;
       const usage  =tool.tool_usage;
+      const download = tool.downloadUrl;
       
       const uploaderName = tool.uploaderName || 'Anonymous';
       const uploaderAvatar = tool.uploaderAvatar || tool_image;
@@ -661,7 +662,8 @@ onValue(ref(db, "tools"), async (snapshot) => {
         btn_download.textContent = '✓ Download';
         
         btn_download.addEventListener('click', async () => {
-          alert(`Downloading ${tool_name}...`);
+          //alert(`Downloading ${tool_name}...`);
+          window.location.href = `${download}`;
           
           try {
             const toolPath = tool.key;
