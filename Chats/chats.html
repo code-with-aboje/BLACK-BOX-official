@@ -6,6 +6,7 @@
   <title>Chat - BlackBox</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
+    
     * {
         margin: 0;
         padding: 0;
@@ -354,23 +355,25 @@
         color: #00ff7f;
       }
       
-     .unread-badge {
-  position: absolute;
-  right: 16px;
-  top: 60%; /* Changed from 50% to move it down */
-  transform: translateY(-50%);
-  background: #00ff7f;
-  color: #0a0e27;
-  border-radius: 50%;
-  min-width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 0 6px;
-}
+      .unread-badge {
+        position: absolute;
+        right:18px;
+        top: 70%;
+        transform: translateY(-50%);
+        background: red;
+        color: white;
+        border-radius: 50%;
+        min-width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 0 6px;
+        z-index: 2;
+      }
+      
       /* Typing Indicator in Chat List */
       .typing-indicator-mini {
         display: inline-flex;
@@ -530,6 +533,7 @@
         display: flex;
         align-items: center;
         gap: 18px;
+        
       }
       
       .current-chat-avatar {
@@ -642,6 +646,37 @@
       .chat-header-actions {
         display: flex;
         gap: 12px;
+    
+      }
+
+      @media(max-width:600px){
+        .chat-header-actions .icon-btn{
+         width: 30px;
+         height: 30px;
+          
+        }
+
+        .chat-header-left {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          margin-top: -2%;
+          font-size: 0.7rem;
+          margin-left:15%;
+        }
+        
+        .current-chat-avatar {
+          width: 50px;
+          height:50px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+          border: 3px solid #3a3a3a;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          overflow: hidden;
+        }
       }
       
       .icon-btn {
@@ -656,6 +691,81 @@
         cursor: pointer;
         transition: all 0.3s ease;
       }
+
+      /* Dropdown Menu */
+.chat-menu {
+  position: relative;
+}
+
+.chat-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 8px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 12px;
+  min-width: 200px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+}
+
+.chat-dropdown.active {
+  display: block;
+  animation: dropdownSlide 0.2s ease;
+}
+
+@keyframes dropdownSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  color: #e0e0e0;
+  font-size: 0.9em;
+}
+
+.dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.dropdown-item.danger {
+  color: #ff4444;
+}
+
+.dropdown-item.danger:hover {
+  background: rgba(255, 68, 68, 0.1);
+}
+
+.dropdown-item svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: #2a2a2a;
+  margin: 4px 0;
+}
       
       .icon-btn:hover {
         background: rgba(255, 255, 255, 0.08);
@@ -715,6 +825,7 @@
         justify-content: center;
         flex-shrink: 0;
         overflow: hidden;
+        display: none;
       }
       
       .message-avatar img {
@@ -731,26 +842,40 @@
       
       .message-content {
         flex: 1;
+        min-width: 0;
       }
       
       .message-bubble {
-        padding: 16px 20px;
+        padding: 12px 16px;
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid #2a2a2a;
-        border-radius: 20px 20px 20px 4px;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+        border-bottom-right-radius: 18px;
         color: #e0e0e0;
         font-size: 0.95em;
         line-height: 1.6;
         margin-bottom: 6px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        white-space: pre-wrap;
       }
       
       .message.sent .message-bubble {
         background: linear-gradient(135deg, #ffffff, #f0f0f0);
         color: #0a0a0a;
         border: none;
-        border-radius: 20px 20px 4px 20px;
+        border-top-left-radius: 18px;
+        border-top-right-radius: 18px;
+        border-bottom-left-radius: 18px;
+        border-bottom-right-radius: 4px;
         box-shadow: 0 4px 16px rgba(255, 255, 255, 0.1);
+      }
+
+      .message.received .message-bubble {
+        border-bottom-right-radius: 18px;
+        border-bottom-left-radius: 4px;
       }
       
       .message-footer {
@@ -1339,94 +1464,6 @@
   font-weight: 600;
 }
 
-/* Unread badge */
-.unread-badge {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: #00ff7f;
-  color: #0a0e27;
-  border-radius: 50%;
-  min-width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 0 6px;
-}
-
-/* Typing indicator mini (in chat list) */
-.typing-indicator-mini {
-  display: inline-flex;
-  gap: 3px;
-  margin-right: 5px;
-  vertical-align: middle;
-}
-
-.typing-indicator-mini span {
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: #00ff7f;
-  animation: typingBounce 1.4s infinite ease-in-out;
-}
-
-.typing-indicator-mini span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-indicator-mini span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-/* Typing indicator (in header) */
-.typing-indicator {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.typing-indicator span {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #00ff7f;
-  animation: typingPulse 1.4s infinite ease-in-out;
-}
-
-.typing-indicator span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing-indicator span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes typingBounce {
-  0%, 60%, 100% { 
-    transform: translateY(0); 
-    opacity: 0.7;
-  }
-  30% { 
-    transform: translateY(-6px); 
-    opacity: 1;
-  }
-}
-
-@keyframes typingPulse {
-  0%, 60%, 100% { 
-    opacity: 0.3; 
-    transform: scale(0.8); 
-  }
-  30% { 
-    opacity: 1; 
-    transform: scale(1.3); 
-  }
-}
-
 /* Message status ticks */
 .message-status {
   display: inline-flex;
@@ -1473,6 +1510,113 @@
   font-size: 11px;
   opacity: 0.7;
 }
+
+/* WhatsApp Message Bubbles */
+.message-bubble {
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #1a1a1a, #141414);
+  border: 1px solid #888;
+  border-radius: 8px;
+  border-top-left-radius: 0;
+  color: #e7edf1;
+  font-size: 14.2px;
+  line-height: 19px;
+  margin-bottom: 2px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+
+  /* ADJUST WIDTH HERE */
+  max-width: 320px;
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+/* Received message pointer */
+.message:not(.sent) .message-bubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 8px 8px 0;
+  border-color: transparent white;
+}
+
+.message.sent .message-bubble {
+  background: linear-gradient(135deg, #1a1a1a, #141414);
+  border: 1px solid #888;
+  color: #e7edf1;
+  border-radius: 8px;
+  border-top-right-radius: 0;
+  margin-left: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  /* ADJUST WIDTH HERE */
+  max-width: 320px;
+}
+/* Sent message pointer */
+.message.sent .message-bubble::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 0 8px 8px;
+  border-color: transparent white;
+}
+
+/* Message container adjustments */
+.message {
+  display: flex;
+  gap: 8px;
+  max-width: 70%;
+  margin-bottom: 2px;
+  align-items: flex-start;
+}
+
+.message.sent {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+/* Hide avatar for sent messages like WhatsApp */
+.message.sent .message-avatar {
+  display: none;
+}
+
+/* Smaller avatar for received */
+.message .message-avatar {
+  width: 28px;
+  height: 28px;
+  margin-top: 2px;
+}
+
+/* Message time footer */
+.message-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+  font-size: 11px;
+  color: #8696a0;
+  min-height: 15px;
+}
+
+.message.sent .message-footer {
+  color: #66b875; /* WhatsApp sent time color */
+}
+
+/* Remove the old border radius styles */
+.message.received .message-bubble {
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
   </style>
 </head>
 <body>
@@ -1483,6 +1627,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </div>
       <div class="modal-header">
+        
         <h2>Connect with Users</h2>
       </div>
       <div class="modal-body">
@@ -1547,12 +1692,35 @@
           </div>
         </div>
         <div class="chat-header-actions">
+
           <button class="icon-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </button>
-          <button class="icon-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
-          </button>
+
+         <div class="chat-menu">
+  <button class="icon-btn" id="chatMenuBtn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+  </button>
+  
+  <div class="chat-dropdown" id="chatDropdown">
+    <button class="dropdown-item" id="viewProfileBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      View Profile
+    </button>
+    
+    <button class="dropdown-item" id="muteBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5z"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+      Mute Chat
+    </button>
+    
+    <div class="dropdown-divider"></div>
+    
+    <button class="dropdown-item danger" id="clearChatBtn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+      Clear Chat
+    </button>
+  </div>
+</div>
         </div>
       </div>
 
@@ -1969,6 +2137,76 @@
           e.preventDefault();
           sendMessage();
         }
+
+        // Chat menu dropdown
+const chatMenuBtn = document.getElementById('chatMenuBtn');
+const chatDropdown = document.getElementById('chatDropdown');
+const clearChatBtn = document.getElementById('clearChatBtn');
+const viewProfileBtn = document.getElementById('viewProfileBtn');
+const muteBtn = document.getElementById('muteBtn');
+
+if (chatMenuBtn && chatDropdown) {
+  // Toggle dropdown
+  chatMenuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    chatDropdown.classList.toggle('active');
+  });
+
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!chatDropdown.contains(e.target) && !chatMenuBtn.contains(e.target)) {
+      chatDropdown.classList.remove('active');
+    }
+  });
+
+  // Clear chat handler
+  if (clearChatBtn) {
+    clearChatBtn.addEventListener('click', async () => {
+      if (!activeChat) return;
+      
+      // Close dropdown
+      chatDropdown.classList.remove('active');
+      
+      // Confirm before clearing
+      if (confirm('Are you sure you want to clear this chat? This action cannot be undone.')) {
+        try {
+          // Remove all messages for this chat room
+          await remove(ref(db, `messages/${activeChat.chatRoomId}`));
+          
+          // Reset chat room data
+          await update(ref(db, `chatRooms/${activeChat.chatRoomId}`), {
+            lastMessage: null,
+            unreadCount: {
+              [currentUser.uid]: 0,
+              [activeChat.friendId]: 0
+            }
+          });
+          
+          showToast('Chat cleared successfully', 'success');
+        } catch (error) {
+          console.error('Error clearing chat:', error);
+          showToast('Failed to clear chat', 'error');
+        }
+      }
+    });
+  }
+
+  // View profile handler (placeholder)
+  if (viewProfileBtn) {
+    viewProfileBtn.addEventListener('click', () => {
+      chatDropdown.classList.remove('active');
+      showToast('Profile view coming soon!', 'success');
+    });
+  }
+
+  // Mute handler (placeholder)
+  if (muteBtn) {
+    muteBtn.addEventListener('click', () => {
+      chatDropdown.classList.remove('active');
+      showToast('Mute feature coming soon!', 'success');
+    });
+  }
+}
       });
     
       // Typing indicator
@@ -2486,21 +2724,30 @@
           messages[a].timestamp - messages[b].timestamp
         );
         
+
+        // tracks timestamps 
         let lastDate = null;
-        
-        messageIds.forEach(msgId => {
-          const msg = messages[msgId];
-          const msgDate = new Date(msg.timestamp);
-          const dateStr = formatMessageDate(msgDate);
-          
-          // Add date divider if date changed
-          if (dateStr !== lastDate) {
-            const divider = document.createElement('div');
-            divider.className = 'date-divider';
-            divider.innerHTML = `<span>${dateStr}</span>`;
-            messagesContainer.appendChild(divider);
-            lastDate = dateStr;
-          }
+        let lastMessageTime = null;
+
+messageIds.forEach((msgId, index) => {
+  const msg = messages[msgId];
+  const msgDate = new Date(msg.timestamp);
+  const dateStr = formatMessageDate(msgDate);
+  
+  // Add date divider if date changed
+  if (dateStr !== lastDate) {
+    const divider = document.createElement('div');
+    divider.className = 'date-divider';
+    divider.innerHTML = `<span>${dateStr}</span>`;
+    messagesContainer.appendChild(divider);
+    lastDate = dateStr;
+    lastMessageTime = null; // Reset time tracking on new date
+  }
+  
+  // Check if we should show timestamp (3 minutes = 180000 milliseconds)
+  const showTimestamp = !lastMessageTime || (msg.timestamp - lastMessageTime) >= 180000;
+  lastMessageTime = msg.timestamp;
+
           
           // Create message element
           const messageEl = document.createElement('div');
@@ -2511,51 +2758,55 @@
             ? `<img src="${sender.avatar}" alt="${sender.nickname}">`
             : `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
           
-          const time = msgDate.toLocaleTimeString('en-US', { 
-            hour: 'numeric', 
-            minute: '2-digit',
-            hour12: true 
-          });
-          
-          // Read receipts for sent messages
-          let statusHtml = '';
-          if (msg.senderId === currentUser.uid) {
-            const status = msg.status || 'sent';
-            if (status === 'sent') {
-              statusHtml = `
-                <div class="message-status sent">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              `;
-            } else if (status === 'delivered') {
-              statusHtml = `
-                <div class="message-status delivered">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              `;
-            } else if (status === 'read') {
-              statusHtml = `
-                <div class="message-status read">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                </div>
-              `;
+            const time = msgDate.toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            });
+            
+            // Read receipts for sent messages
+            let statusHtml = '';
+            if (msg.senderId === currentUser.uid) {
+              const status = msg.status || 'sent';
+              if (status === 'sent') {
+                statusHtml = `
+                  <div class="message-status sent">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                `;
+              } else if (status === 'delivered') {
+                statusHtml = `
+                  <div class="message-status delivered">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                `;
+              } else if (status === 'read') {
+                statusHtml = `
+                  <div class="message-status read">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  </div>
+                `;
+              }
             }
-          }
-          
-          messageEl.innerHTML = `
-            <div class="message-avatar">
-              ${avatarHtml}
-            </div>
-            <div class="message-content">
-              <div class="message-bubble">${msg.text}</div>
-              <div class="message-footer">
-                <span class="message-time">${time}</span>
-                ${statusHtml}
+            
+            messageEl.innerHTML = `
+              <div class="message-avatar">
+                ${avatarHtml}
               </div>
-            </div>
-          `;
+              <div class="message-content">
+                <div class="message-bubble">${msg.text}</div>
+                <div class="message-footer" style="${!showTimestamp ? 'display: none;' : ''}">
+                  <span class="message-time">${time}</span>
+                  ${statusHtml}
+                </div>
+              </div>
+            `;
+
+
+
+
           
           messagesContainer.appendChild(messageEl);
         });
@@ -2620,5 +2871,3 @@
   </script>
 </body>
 </html>
-
-
