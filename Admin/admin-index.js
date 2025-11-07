@@ -29,6 +29,7 @@ let currentUser = null;
 let currentPage = 'dashboard';
 let usersData = {};
 let postsData = {};
+let tools = {};
 
 // Accessibility helpers
 function setAriaExpanded(el, expanded) {
@@ -521,7 +522,37 @@ function renderPage(page) {
   }
 }
 
+onValue(ref(db, "tools"), async (snapshot) => {
+  if (snapshot.exists()) {
+    const data = snapshot.val();
+    console.log(data);
+    
+    const allTools = [];
+    Object.keys(data).forEach(userId => {
+      if (typeof data[userId] === 'object') {
+        Object.keys(data[userId]).forEach(toolKey => {
+          allTools.push({
+            ...data[userId][toolKey],
+            key: `${userId}/${toolKey}`,
+            sellerId: userId  // 🆕 ADD SELLER ID
+          });
+        });
+      }
+    });
+    
+   const tools_count =  allTools.sort((a, b) => (b.uploadedAt || 0) - (a.uploadedAt || 0));
+    
+  tools = tools_count.length;
+  console.log("tool count" + tools)
+  }
+
+})
+
 function renderDashboard() {
+
+  
+
+  
   const totalUsers = Object.keys(usersData).length;
   const activeUsers = Object.values(usersData).filter(u => u.status === 'online').length;
   const totalPosts = Object.keys(postsData).length;
@@ -572,8 +603,8 @@ function renderDashboard() {
             24%
           </div>
         </div>
-        <div class="stat-value">${totalPosts}</div>
-        <div class="stat-label">Total Posts</div>
+        <div class="stat-value">${tools}</div>
+        <div class="stat-label">Total Tools</div>
       </div>
 
       <div class="stat-card">
@@ -1251,4 +1282,6 @@ function showToast(message, type = 'success') {
 }
 
 
-
+  
+  
+  
