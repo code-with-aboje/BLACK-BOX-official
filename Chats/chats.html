@@ -2835,17 +2835,17 @@
           }
           
           messageEl.innerHTML = `
-            <div class="message-avatar">
-              ${avatarHtml}
-            </div>
-            <div class="message-content">
-              <div class="message-bubble">${msg.text}</div>
-              <div class="message-footer" style="${!showTimestamp ? 'display: none;' : ''}">
-                <span class="message-time">${time}</span>
-                ${statusHtml}
-              </div>
-            </div>
-          `;
+  <div class="message-avatar">
+    ${avatarHtml}
+  </div>
+  <div class="message-content">
+    <div class="message-bubble">${msg.text}</div>
+    <div class="message-footer">
+      <span class="message-time" style="${!showTimestamp ? 'display: none;' : ''}">${time}</span>
+      ${statusHtml}
+    </div>
+  </div>
+`;
           
           messagesContainer.appendChild(messageEl);
         });
@@ -2910,6 +2910,7 @@
   </script>
 </body>
 </html>
+
 
 
 
