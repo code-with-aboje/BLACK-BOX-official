@@ -1981,6 +1981,177 @@
   border-radius: 3px;
   transition: width 0.3s ease;
 }
+
+/* skeletalload*/
+/* Chat Loading Skeleton */
+.chat-loading-skeleton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none; /* Hidden by default */
+  flex-direction: column;
+  gap: 20px;
+  padding: 36px;
+  overflow: hidden;
+  background: #0a0a0a; /* Add background to cover content */
+  z-index: 5; /* Ensure it's above messages */
+}
+
+.chat-loading-skeleton.active {
+  display: flex !important; /* Force display with !important */
+}
+
+.skeleton-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.skeleton-message {
+  display: flex;
+  gap: 12px;
+  max-width: 70%;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-message.sent {
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.skeleton-message.sent .skeleton-bubble {
+  background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%);
+}
+
+.skeleton-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #0a0a0a 25%, #1a1a1a 50%, #0a0a0a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  flex-shrink: 0;
+}
+
+.skeleton-bubble {
+  flex: 1;
+  height: 60px;
+  border-radius: 18px;
+  background: linear-gradient(90deg, #0a0a0a 25%, #1a1a1a 50%, #0a0a0a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes skeletonPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Ensure messages container is positioned for skeleton overlay */
+.chat-main {
+  position: relative; /* Add this */
+}
+
+/* Hide empty state when skeleton is active
+.chat-loading-skeleton.active ~ .messages-container {
+  display: none;
+}
+*/
+
+/* Chat List Loading Skeleton */
+.chat-list-skeleton {
+  padding: 16px;
+  display: none;
+}
+
+.chat-list-skeleton.active {
+  display: block !important;
+}
+
+.skeleton-chat-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  animation: skeletonPulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-chat-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #0a0a0a 25%, #1a1a1a 50%, #0a0a0a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  flex-shrink: 0;
+}
+
+.skeleton-chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skeleton-chat-name {
+  width: 120px;
+  height: 16px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #0a0a0a 25%, #1a1a1a 50%, #0a0a0a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-chat-time {
+  width: 40px;
+  height: 12px;
+  border-radius: 6px;
+  background: linear-gradient(90deg, #0a0a0a 25%, #1a1a1a 50%, #0a0a0a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton-chat-preview {
+  width: 80%;
+  height: 14px;
+  border-radius: 7px;
+  background: linear-gradient(90deg, #0a0a0a 25%, #1a1a1a 50%, #0a0a0a 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Different widths for variety */
+.skeleton-chat-item:nth-child(2) .skeleton-chat-name {
+  width: 100px;
+}
+
+.skeleton-chat-item:nth-child(3) .skeleton-chat-name {
+  width: 140px;
+}
+
+.skeleton-chat-item:nth-child(2) .skeleton-chat-preview {
+  width: 70%;
+}
+
+.skeleton-chat-item:nth-child(3) .skeleton-chat-preview {
+  width: 90%;
+}
+
   </style>
 </head>
 <body>
@@ -2037,9 +2208,69 @@
           Discover
         </button>
       </div>
-
-      <div class="chat-list" id="chatList"></div>
+<!-- chat list + skeleton -->
+<div class="chat-list" id="chatList">
+  <!-- Chat List Skeleton -->
+  <div class="chat-list-skeleton" id="chatListSkeleton">
+    <div class="skeleton-chat-item">
+      <div class="skeleton-chat-avatar"></div>
+      <div class="skeleton-chat-content">
+        <div class="skeleton-chat-header">
+          <div class="skeleton-chat-name"></div>
+          <div class="skeleton-chat-time"></div>
+        </div>
+        <div class="skeleton-chat-preview"></div>
+      </div>
     </div>
+    
+    <div class="skeleton-chat-item">
+      <div class="skeleton-chat-avatar"></div>
+      <div class="skeleton-chat-content">
+        <div class="skeleton-chat-header">
+          <div class="skeleton-chat-name"></div>
+          <div class="skeleton-chat-time"></div>
+        </div>
+        <div class="skeleton-chat-preview"></div>
+      </div>
+    </div>
+    
+    <div class="skeleton-chat-item">
+      <div class="skeleton-chat-avatar"></div>
+      <div class="skeleton-chat-content">
+        <div class="skeleton-chat-header">
+          <div class="skeleton-chat-name"></div>
+          <div class="skeleton-chat-time"></div>
+        </div>
+        <div class="skeleton-chat-preview"></div>
+      </div>
+    </div>
+    
+    <div class="skeleton-chat-item">
+      <div class="skeleton-chat-avatar"></div>
+      <div class="skeleton-chat-content">
+        <div class="skeleton-chat-header">
+          <div class="skeleton-chat-name"></div>
+          <div class="skeleton-chat-time"></div>
+        </div>
+        <div class="skeleton-chat-preview"></div>
+      </div>
+    </div>
+    
+    <div class="skeleton-chat-item">
+      <div class="skeleton-chat-avatar"></div>
+      <div class="skeleton-chat-content">
+        <div class="skeleton-chat-header">
+          <div class="skeleton-chat-name"></div>
+          <div class="skeleton-chat-time"></div>
+        </div>
+        <div class="skeleton-chat-preview"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    </div>
+
+    
 
     <div class="chat-main">
       <div class="chat-header" id="chatHeader" style="display: none;">
@@ -2052,18 +2283,15 @@
             <h2 id="currentChatName">Select a chat</h2>
             <div class="current-chat-status" id="currentChatStatus">Offline</div>
           </div>
-        </div>
+          </div>
         <div class="chat-header-actions">
-
           <button class="icon-btn">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
           </button>
-
          <div class="chat-menu">
   <button class="icon-btn" id="chatMenuBtn">
     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
   </button>
-  
   <div class="chat-dropdown" id="chatDropdown">
     <button class="dropdown-item" id="viewProfileBtn">
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -2086,6 +2314,32 @@
         </div>
       </div>
 
+      <div class="chat-loading-skeleton" id="chatLoadingSkeleton">
+        <div class="skeleton-messages">
+          <div class="skeleton-message received">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-bubble"></div>
+          </div>
+          <div class="skeleton-message sent">
+            <div class="skeleton-bubble"></div>
+          </div>
+          <div class="skeleton-message received">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-bubble"></div>
+          </div>
+          <div class="skeleton-message sent">
+            <div class="skeleton-bubble"></div>
+          </div>
+          <div class="skeleton-message received">
+            <div class="skeleton-avatar"></div>
+            <div class="skeleton-bubble"></div>
+          </div>
+          <div class="skeleton-message sent">
+            <div class="skeleton-bubble"></div>
+          </div>
+        </div>
+      </div>
+    
       <div class="messages-container" id="messagesContainer">
         <div class="empty-state">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
@@ -2602,19 +2856,93 @@ let isOnline = navigator.onLine;
         lastSeen: Date.now()
       });
     }
-    
-    function initializeChat() {
-      loadUsers();
-      loadFriendRequests();
-      loadFriends();
-      loadSentRequests();
-      setupEventListeners();
-      renderCurrentTab();
-
-      //online detection
-      setupOnlineDetection();
+    // skeletal display  function
+    // Show chat loading skeleton
+    // Show chat loading skeleton
+    function showChatSkeleton() {
+      console.log('🔵 SHOWING SKELETON');
+      
+      const skeleton = document.getElementById('chatLoadingSkeleton');
+      const messagesContainer = document.getElementById('messagesContainer');
+      const chatHeader = document.getElementById('chatHeader');
+      const chatInputContainer = document.getElementById('chatInputContainer');
+      
+      console.log('Skeleton element:', skeleton);
+      
+      if (skeleton) {
+        skeleton.classList.add('active');
+        console.log('Skeleton classes after add:', skeleton.className);
+      } else {
+        console.error('❌ Skeleton element not found!');
+      }
+      
+      if (messagesContainer) messagesContainer.style.display = 'none';
+      if (chatHeader && chatHeader.style.display !== 'none') {
+        // Don't hide if already showing
+      }
+      if (chatInputContainer && chatInputContainer.style.display !== 'none') {
+        // Don't hide if already showing
+      }
     }
 
+// Hide chat loading skeleton
+// Hide chat loading skeleton
+function hideChatSkeleton() {
+  console.log('🔴 HIDING SKELETON');
+  
+  const skeleton = document.getElementById('chatLoadingSkeleton');
+  const messagesContainer = document.getElementById('messagesContainer');
+  
+  if (skeleton) {
+    skeleton.classList.remove('active');
+    console.log('Skeleton hidden, classes:', skeleton.className);
+  }
+  
+  if (messagesContainer) {
+    messagesContainer.style.display = 'flex';
+  }
+}
+
+// shows chat lists skeleton
+// Show chat list skeleton
+function showChatListSkeleton() {
+  console.log('🔵 SHOWING CHAT LIST SKELETON');
+  const skeleton = document.getElementById('chatListSkeleton');
+  
+  if (skeleton) {
+    skeleton.classList.add('active');
+    console.log('Chat list skeleton shown');
+  } else {
+    console.error('❌ Chat list skeleton element not found!');
+  }
+}
+
+// Hide chat list skeleton
+function hideChatListSkeleton() {
+  console.log('🔴 HIDING CHAT LIST SKELETON');
+  const skeleton = document.getElementById('chatListSkeleton');
+  
+  if (skeleton) {
+    skeleton.classList.remove('active');
+    console.log('Chat list skeleton hidden');
+  }
+}
+
+function initializeChat() {
+  // Show chat list skeleton initially
+  showChatListSkeleton();
+  
+  loadUsers();
+  loadFriendRequests();
+  loadFriends(); // This will hide skeleton when done
+  loadSentRequests();
+  setupEventListeners();
+  
+ // REMOVE THIS LINE
+  
+  // Setup online detection
+  setupOnlineDetection();
+}
     // online detection
     // Setup online/offline detection
 function setupOnlineDetection() {
@@ -2699,22 +3027,29 @@ async function processPendingMessages() {
     }
     
     // Load friends and chat rooms
-    function loadFriends() {
-      onValue(ref(db, `friends/${currentUser.uid}`), (snapshot) => {
-        friends = {};
-        if (snapshot.exists()) {
-          friends = snapshot.val();
-          
-          // Load chat room data for each friend
-          Object.keys(friends).forEach(friendId => {
-            const chatRoomId = friends[friendId].chatRoomId;
-            loadChatRoomData(chatRoomId);
-            listenToTyping(chatRoomId, friendId);
-          });
-        }
-        if (currentTab === 'chats') renderChats();
+    // Load friends and chat rooms
+function loadFriends() {
+  onValue(ref(db, `friends/${currentUser.uid}`), (snapshot) => {
+    friends = {};
+    if (snapshot.exists()) {
+      friends = snapshot.val();
+      
+      // Load chat room data for each friend
+      Object.keys(friends).forEach(friendId => {
+        const chatRoomId = friends[friendId].chatRoomId;
+        loadChatRoomData(chatRoomId);
+        listenToTyping(chatRoomId, friendId);
       });
     }
+
+    // Hide skeleton after friends are loaded
+    setTimeout(() => {
+      hideChatListSkeleton();
+    }, 500);
+    
+    if (currentTab === 'chats') renderChats();
+  });
+}
     
     // Load chat room data (last message, unread count)
     function loadChatRoomData(chatRoomId) {
@@ -3020,13 +3355,27 @@ if (mediaViewer) {
         setTypingStatus(false);
       });
     
+      
       // Tab switching
       document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', () => {
           document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
           tab.classList.add('active');
           currentTab = tab.dataset.tab;
-          renderCurrentTab();
+          
+          // Show skeleton when switching to chats tab
+          if (currentTab === 'chats') {
+            showChatListSkeleton();
+            
+            // Delay to show skeleton animation effect
+            setTimeout(() => {
+              renderCurrentTab();
+              hideChatListSkeleton();
+            }, 800);
+          } else {
+            // For other tabs, just render immediately
+            renderCurrentTab();
+          }
         });
       });
     
@@ -3319,6 +3668,7 @@ if (mediaViewer) {
     
     // Render chats (sorted by most recent, unread messages at top)
     function renderChats(searchQuery = '') {
+      hideChatListSkeleton();
       chatList.innerHTML = '';
       
       const friendIds = Object.keys(friends);
@@ -3745,7 +4095,6 @@ function addMessageToUI(messageData) {
     minute: '2-digit',
     hour12: true 
   });
-  
   const messageEl = document.createElement('div');
   messageEl.className = 'message sent';
   messageEl.dataset.messageId = messageData.messageId;
