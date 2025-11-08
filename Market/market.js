@@ -259,7 +259,7 @@ async function createToolCard(tool) {
   const sellerId = tool.sellerId;
   const usage = tool.tool_usage;
   const tool_category = tool.category || 'developer';
-  const download_link = tool.downloadLink || '';
+  const download_link = tool.downloadUrl || '';
   const uploaderName = tool.uploaderName || 'Anonymous';
   const uploaderAvatar = tool.uploaderAvatar || tool_image;
   const uploadedAt = tool.uploadedAt || Date.now();
