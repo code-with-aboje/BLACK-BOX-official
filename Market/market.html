@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BlackBox Marketplace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
    <link rel="stylesheet" href="market.css">
 </head>
 <body>
@@ -14,11 +15,85 @@
     <p>Browse developer tools curated by the community</p>
 </div>
 
+<!--FILTER SECTION -->
+<!-- Replace your filter section with this: -->
+<div class="filter-section">
+    <div class="filter-container">
+        <label class="filter-label">Filter by Category</label>
+        <div class="custom-select-filter">
+            <div class="select-trigger-filter" id="categoryTrigger">
+                <span class="placeholder">Choose a category...</span>
+                <div class="select-arrow-filter"></div>
+            </div>
+            <div class="select-dropdown-filter" id="categoryDropdown">
+                <div class="select-option-filter" data-value="all">
+                    <div class="option-content-filter">
+                        <div class="category-icon-filter">🌐</div>
+                        <div class="option-details-filter">
+                            <div class="option-title-filter">All Categories</div>
+                            <div class="option-description-filter">Show all tools</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-option-filter" data-value="developer">
+                    <div class="option-content-filter">
+                        <div class="category-icon-filter">🔧</div>
+                        <div class="option-details-filter">
+                            <div class="option-title-filter">Developer Tools</div>
+                            <div class="option-description-filter">Apps, scripts, and development tools</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-option-filter" data-value="design">
+                    <div class="option-content-filter">
+                        <div class="category-icon-filter">🎨</div>
+                        <div class="option-details-filter">
+                            <div class="option-title-filter">Design Projects</div>
+                            <div class="option-description-filter">Creative design work and projects</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-option-filter" data-value="uiux">
+                    <div class="option-content-filter">
+                        <div class="category-icon-filter">💻</div>
+                        <div class="option-details-filter">
+                            <div class="option-title-filter">UI/UX Design</div>
+                            <div class="option-description-filter">Interface designs and user experiences</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-option-filter" data-value="animation">
+                    <div class="option-content-filter">
+                        <div class="category-icon-filter">🎬</div>
+                        <div class="option-details-filter">
+                            <div class="option-title-filter">Animation</div>
+                            <div class="option-description-filter">Animations and motion graphics</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-option-filter" data-value="vr">
+                    <div class="option-content-filter">
+                        <div class="category-icon-filter">🥽</div>
+                        <div class="option-details-filter">
+                            <div class="option-title-filter">Virtual Reality</div>
+                            <div class="option-description-filter">VR experiences and applications</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="select-option-filter" data-value="ai">
+                    <div class="option-content-filter">
+                        <div class="category-icon-filter">🤖</div>
+                        <div class="option-details-filter">
+                            <div class="option-title-filter">AI Strategy</div>
+                            <div class="option-description-filter">AI strategies and implementations</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="market-container" id="marketContainer"></div>
-<div class="null"></div>
-<!-- Info Dialogs Container -->
-<div id="dialogs"></div>
-
 <script src="market.js" type="module">
     
 </script>
