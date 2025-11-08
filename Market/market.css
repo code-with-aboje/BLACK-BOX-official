@@ -334,7 +334,8 @@ body {
     border: 1px solid #2a2a2a;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    border: 1px solid #00ff7f44;
 }
 
 .filter-label {
@@ -357,7 +358,7 @@ body {
 .select-trigger-filter {
     width: 100%;
     padding: 16px 18px;
-    background: rgba(255, 255, 255, 0.03);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     border: 2px solid #2a2a2a;
     border-radius: 12px;
     color: #ffffff;
@@ -370,11 +371,19 @@ body {
     justify-content: space-between;
     align-items: center;
     user-select: none;
+    border: 1px solid #00ff7f44;
+    
 }
+.select-trigger-filter span{
+    color: white;
+}
+
+
+
 
 .select-trigger-filter:hover {
     background: rgba(255, 255, 255, 0.06);
-    border-color: #3a3a3a;
+    border-color:white;
 }
 
 .select-trigger-filter.active {
