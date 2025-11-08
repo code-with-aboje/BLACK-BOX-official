@@ -4004,88 +4004,135 @@ if (mediaViewer) {
     }
 
     // Send message - with offline support
-async function sendMessage() {
-  const text = messageInput.value.trim();
-  if (!text || !activeChat) return;
-  
-  const messageId = push(ref(db, `messages/${activeChat.chatRoomId}`)).key;
-  const timestamp = Date.now();
-  
-  const messageData = {
-    messageId,
-    chatRoomId: activeChat.chatRoomId,
-    text,
-    senderId: currentUser.uid,
-    timestamp,
-    friendId: activeChat.friendId,
-    status: 'pending'
-  };
-  
-  // Check if this message is already being sent (prevent duplicates)
-  const messageKey = `${activeChat.chatRoomId}_${text}_${timestamp}`;
-  if (pendingMessages[messageKey]) {
-    console.log('Message already being sent, ignoring duplicate');
-    return;
-  }
-  
-  // Mark as pending
-  pendingMessages[messageKey] = true;
-  
-  // Clear input immediately for better UX
-  messageInput.value = '';
-  messageInput.style.height = 'auto';
-  setTypingStatus(false);
-  
-  // Add message to UI immediately (optimistic update)
-  addMessageToUI(messageData);
-  
-  if (!isOnline) {
-    // Queue message for later
-    messageQueue.push(messageData);
-    showToast('Message queued - will send when online', 'error');
-    delete pendingMessages[messageKey];
-    return;
-  }
-  
-  try {
-    await sendMessageToFirebase(messageData);
-    delete pendingMessages[messageKey];
-  } catch (error) {
-    console.error('Error sending message:', error);
-    messageQueue.push(messageData);
-    showToast('Message queued - will retry', 'error');
-    delete pendingMessages[messageKey];
-  }
-}
+    // Send message - with offline support and token check
+    async function sendMessage() {
+      const text = messageInput.value.trim();
+      if (!text || !activeChat) return;
+      
+      // ⭐ CHECK IF USER HAS ENOUGH TOKENS
+      const userSnapshot = await get(ref(db, `users/${currentUser.uid}`));
+      if (userSnapshot.exists()) {
+        const userData = userSnapshot.val();
+        const currentTokens = userData.tokens || 0;
+        
+        if (currentTokens < 4) {
+          showToast('❌ Insufficient tokens! You need up to 4 tokens to send a message.', 'error');
+          return; // Stop sending
+        }
+      }
+      
+      const messageId = push(ref(db, `messages/${activeChat.chatRoomId}`)).key;
+      const timestamp = Date.now();
+      
+      const messageData = {
+        messageId,
+        chatRoomId: activeChat.chatRoomId,
+        text,
+        senderId: currentUser.uid,
+        timestamp,
+        friendId: activeChat.friendId,
+        status: 'pending'
+      };
+      
+      // Check if this message is already being sent (prevent duplicates)
+      const messageKey = messageId; // Use messageId as key
+      if (pendingMessages[messageKey]) {
+        console.log('Message already being sent, ignoring duplicate');
+        return;
+      }
+      
+      // Mark as pending
+      pendingMessages[messageKey] = true;
+      
+      // Clear input immediately for better UX
+      messageInput.value = '';
+      messageInput.style.height = 'auto';
+      setTypingStatus(false);
+      
+      // Add message to UI immediately (optimistic update)
+      addMessageToUI(messageData);
+      
+      if (!isOnline) {
+        // Queue message for later
+        messageQueue.push(messageData);
+        showToast('Message queued - will send when online', 'error');
+        delete pendingMessages[messageKey];
+        return;
+      }
+      
+      try {
+        await sendMessageToFirebase(messageData);
+        delete pendingMessages[messageKey];
+      } catch (error) {
+        console.error('Error sending message:', error);
+        messageQueue.push(messageData);
+        showToast('Message queued - will retry', 'error');
+        delete pendingMessages[messageKey];
+      }
+    }
+
 
 // Send message to Firebase
 async function sendMessageToFirebase(messageData) {
-  await set(ref(db, `messages/${messageData.chatRoomId}/${messageData.messageId}`), {
-    text: messageData.text,
-    senderId: messageData.senderId,
-    timestamp: messageData.timestamp,
-    status: 'sent',
-    type: 'text'
-  });
-  
-  // Update chat room data
-  await update(ref(db, `chatRooms/${messageData.chatRoomId}`), {
-    lastMessage: {
+  try {
+    // Save message to database
+    await set(ref(db, `messages/${messageData.chatRoomId}/${messageData.messageId}`), {
       text: messageData.text,
       senderId: messageData.senderId,
-      timestamp: messageData.timestamp
-    },
-    [`unreadCount/${messageData.friendId}`]: (chatRoomsData[messageData.chatRoomId]?.unreadCount?.[messageData.friendId] || 0) + 1
-  });
-  
-  // Update to delivered status
-  setTimeout(async () => {
-    await update(ref(db, `messages/${messageData.chatRoomId}/${messageData.messageId}`), {
-      status: 'delivered',
-      deliveredAt: Date.now()
+      timestamp: messageData.timestamp,
+      status: 'sent',
+      type: 'text'
     });
-  }, 500);
+    
+    // Update chat room data
+    await update(ref(db, `chatRooms/${messageData.chatRoomId}`), {
+      lastMessage: {
+        text: messageData.text,
+        senderId: messageData.senderId,
+        timestamp: messageData.timestamp
+      },
+      [`unreadCount/${messageData.friendId}`]: (chatRoomsData[messageData.chatRoomId]?.unreadCount?.[messageData.friendId] || 0) + 1
+    });
+    
+    // ⭐ DEDUCT 4 TOKENS FROM USER
+    const userRef = ref(db, `users/${currentUser.uid}`);
+    const userSnapshot = await get(userRef);
+    
+    if (userSnapshot.exists()) {
+      const userData = userSnapshot.val();
+      const currentTokens = userData.tokens || 0;
+      const newTokens = Math.max(0, currentTokens - 4); // Ensure tokens don't go below 0
+      
+      await update(userRef, {
+        tokens: newTokens
+      });
+      
+      console.log(`💰 Tokens deducted: ${currentTokens} → ${newTokens}`);
+      
+      // Show warning if tokens are low
+      if (newTokens < 20 && newTokens > 0) {
+        showToast(`⚠️ Low balance: ${newTokens} tokens remaining`, 'error');
+      } else if (newTokens === 0) {
+        showToast('❌ Out of tokens! Please top up to continue messaging.', 'error');
+      }
+    }
+    
+    // Update to delivered status
+    setTimeout(async () => {
+      await update(ref(db, `messages/${messageData.chatRoomId}/${messageData.messageId}`), {
+        status: 'delivered',
+        deliveredAt: Date.now()
+      });
+    }, 500);
+    
+  } catch (error) {
+    console.error('Error sending message:', error);
+    throw error;
+  }
 }
+
+
+
 
 // Add message to UI immediately (optimistic update)
 function addMessageToUI(messageData) {
@@ -4095,6 +4142,7 @@ function addMessageToUI(messageData) {
     minute: '2-digit',
     hour12: true 
   });
+  
   const messageEl = document.createElement('div');
   messageEl.className = 'message sent';
   messageEl.dataset.messageId = messageData.messageId;
