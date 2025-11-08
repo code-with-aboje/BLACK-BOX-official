@@ -55,12 +55,11 @@
       }
       
       .sidebar-header {
-       padding: 0 24px 28px 24px;
-       border-bottom: 1px solid #2a2a2a;
-       position: relative;
-       z-index: 2;
-       padding-top:0px;
-}
+        padding: 0 24px 28px 24px;
+        border-bottom: 1px solid #2a2a2a;
+        position: relative;
+        z-index: 2;
+      }
       
       .sidebar-title {
         display: flex;
@@ -1038,6 +1037,91 @@
         height: 20px;
         color: #888;
       }
+
+      /* sticker pack styling */
+      /* Sticker Picker */
+.sticker-picker {
+  position: absolute;
+  bottom: 80px;
+  left: 20px;
+  background: linear-gradient(180deg, #1a1a1a 0%, #0f0f0f 100%);
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  width: 350px;
+  max-height: 400px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
+}
+
+.sticker-picker.active {
+  display: flex;
+}
+
+.sticker-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 12px;
+  border-bottom: 1px solid #2a2a2a;
+  overflow-x: auto;
+}
+
+.sticker-tab {
+  min-width: 40px;
+  height: 40px;
+  background: transparent;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 24px;
+}
+
+.sticker-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.sticker-tab.active {
+  border-color: #00ff7f;
+  background: rgba(0, 255, 127, 0.1);
+}
+
+.sticker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 12px;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.sticker-item {
+  aspect-ratio: 1;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 32px; 
+  padding: 4px; 
+}
+
+.sticker-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: scale(1.1);
+}
+
+.sticker-item:active {
+  transform: scale(0.95);
+}
       
       .message-input {
         flex: 1;
@@ -1430,7 +1514,11 @@
           margin-top:3%;
         }
       
-       
+        /*
+        #sidebar_title{
+          margin-top:12%;
+        }
+        */
       
         #newChatModal{
           margin-top: 6%;
@@ -1664,7 +1752,235 @@
     display: flex;
   }
 }
+/* file styling */
 
+/* Media Viewer Modal */
+.media-viewer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.media-viewer-overlay.active {
+  display: flex;
+}
+
+.media-viewer-content {
+  max-width: 90vw;
+  max-height: 90vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.media-viewer-content img,
+.media-viewer-content video {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+.media-viewer-controls {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.media-viewer-btn {
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.media-viewer-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.media-viewer-btn svg {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+}
+
+.media-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.media-close-btn:hover {
+  background: rgba(255, 0, 0, 0.3);
+  border-color: #ff0050;
+  transform: rotate(90deg);
+}
+
+.media-close-btn svg {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+}
+
+/* Media Message Bubbles */
+.message-bubble.media-bubble {
+  padding: 4px;
+  background: transparent;
+  border: none;
+  max-width: 80%;
+}
+
+.message-bubble.media-bubble img,
+.message-bubble.media-bubble video {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.message-bubble.media-bubble img:hover,
+.message-bubble.media-bubble video:hover {
+  transform: scale(1.02);
+}
+
+.message-bubble.audio-bubble {
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #2a2a2a;
+  max-width: 280px;
+  border-radius: 20px;
+}
+
+.message.sent .message-bubble.audio-bubble {
+  background: linear-gradient(135deg, #1a1a1a, #141414);
+  border: 1px solid #888;
+}
+
+.audio-player {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.audio-play-btn {
+  width: 36px;
+  height: 36px;
+  background: #00ff7f;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.audio-play-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0, 255, 127, 0.3);
+}
+
+.audio-play-btn svg {
+  width: 16px;
+  height: 16px;
+  color: #000;
+  margin-left: 2px;
+}
+
+.audio-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.audio-name {
+  font-size: 0.85em;
+  font-weight: 600;
+  color: #fff;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.audio-duration {
+  font-size: 0.7em;
+  color: #888;
+  margin-top: 1px;
+  line-height: 1.2;
+}
+
+/* File upload progress */
+.upload-progress {
+  position: fixed;
+  bottom: 100px;
+  right: 32px;
+  background: linear-gradient(135deg, #1a1a1a, #0f0f0f);
+  border: 1px solid #2a2a2a;
+  border-radius: 16px;
+  padding: 16px 20px;
+  min-width: 300px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  animation: slideInRight 0.4s ease;
+}
+
+.upload-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.upload-progress-text {
+  font-size: 0.9em;
+  font-weight: 600;
+  color: #fff;
+}
+
+.upload-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.upload-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00ff7f, #00cc66);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
   </style>
 </head>
 <body>
@@ -1779,13 +2095,34 @@
       </div>
 
       <div class="chat-input-container" id="chatInputContainer" style="display: none;">
+
+      <!-- file inputs -->
+      <input type="file" id="fileInput" accept="image/*,video/*,audio/*" style="display: none;" multiple>
+
+        <!-- Sticker Picker -->
+        <div class="sticker-picker" id="stickerPicker">
+          <div class="sticker-tabs" id="stickerTabs">
+            <button class="sticker-tab active" data-pack="recent">🕒</button>
+            <button class="sticker-tab" data-pack="smileys">😀</button>
+            <button class="sticker-tab" data-pack="animals">🐶</button>
+            <button class="sticker-tab" data-pack="food">🍕</button>
+            <button class="sticker-tab" data-pack="activities">⚽</button>
+            <button class="sticker-tab" data-pack="travel">✈️</button>
+            <button class="sticker-tab" data-pack="objects">💡</button>
+          </div>
+          <div class="sticker-grid" id="stickerGrid"></div>
+        </div>
+      
         <div class="chat-input-wrapper">
+
           <div class="input-actions">
-            <button class="input-icon-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
-            </button>
-            <button class="input-icon-btn">
+            <!-- sticker button -->
+            <button class="input-icon-btn" id="stickerBtn">
               <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+            </button>
+            <!-- file attachment button -->
+            <button class="input-icon-btn" id="fileBtn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
             </button>
           </div>
           <textarea class="message-input" id="messageInput" placeholder="Type a message..." rows="1"></textarea>
@@ -1796,6 +2133,14 @@
         </div>
       </div>
     </div>
+  </div>
+
+  <!-- Media Viewer Modal -->
+  <div class="media-viewer-overlay" id="mediaViewer">
+    <div class="media-close-btn" id="mediaViewerClose">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+    </div>
+    <div class="media-viewer-content" id="mediaViewerContent"></div>
   </div>
 
   <script type="module">
@@ -1825,9 +2170,320 @@
     let activeChat = null;
     let currentTab = 'chats';
     let sentRequests = {};
-    let typingTimeouts = {};
-    let chatRoomsData = {};
-    let messagesListeners = {};
+
+    // sticker functions
+
+   let typingTimeouts = {};
+let chatRoomsData = {};
+let messagesListeners = {};
+
+// Sticker packs
+const stickerPacks = {
+  recent: [],
+  smileys: ['😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂', '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩', '😘', '😗', '😚', '😙', '🥲', '😋', '😛', '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔', '🤐'],
+  animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞'],
+  food: ['🍕', '🍔', '🍟', '🌭', '🍿', '🧂', '🥓', '🥚', '🍳', '🧇', '🥞', '🧈', '🍞', '🥐', '🥨', '🥯', '🥖', '🧀', '🥗', '🥙', '🥪', '🌮', '🌯', '🫔', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟'],
+  activities: ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷', '⛸️', '🥌'],
+  travel: ['✈️', '🚀', '🛸', '🚁', '🛶', '⛵', '🚤', '🛳️', '⛴️', '🚢', '🚂', '🚃', '🚄', '🚅', '🚆', '🚇', '🚈', '🚉', '🚊', '🚝', '🚞', '🚋', '🚌', '🚍', '🚎', '🚐', '🚑', '🚒', '🚓', '🚔', '🚕', '🚖'],
+  objects: ['💡', '🔦', '🕯️', '🪔', '🧯', '🛢️', '💸', '💵', '💴', '💶', '💷', '🪙', '💰', '💳', '💎', '⚖️', '🪜', '🧰', '🪛', '🔧', '🔨', '⚒️', '🛠️', '⛏️', '🪚', '🔩', '⚙️', '🪤', '🧱', '⛓️', '🧲', '🔫']
+};
+
+let currentStickerPack = 'recent';
+let recentStickers = [];
+// FILE-RELATED VARIABLES:
+let currentMediaUrl = null;
+let currentMediaType = null;
+
+
+// Render stickers
+function renderStickers(packName) {
+  const stickerGrid = document.getElementById('stickerGrid');
+  stickerGrid.innerHTML = '';
+  
+  let stickers = packName === 'recent' ? recentStickers : stickerPacks[packName];
+  
+  if (stickers.length === 0 && packName === 'recent') {
+    stickerGrid.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No recent stickers</p>';
+    return;
+  }
+  
+  stickers.forEach(sticker => {
+    const btn = document.createElement('button');
+    btn.className = 'sticker-item';
+    btn.textContent = sticker;
+    btn.addEventListener('click', () => sendSticker(sticker));
+    stickerGrid.appendChild(btn);
+  });
+}
+
+// Send sticker - shows in input first
+function sendSticker(sticker) {
+  if (!activeChat) return;
+  
+  // Add sticker to input instead of sending directly
+  messageInput.value = sticker;
+  messageInput.focus();
+  
+  // Add to recent stickers
+  if (!recentStickers.includes(sticker)) {
+    recentStickers.unshift(sticker);
+    if (recentStickers.length > 32) {
+      recentStickers.pop();
+    }
+  }
+  
+  // Close sticker picker
+  document.getElementById('stickerPicker').classList.remove('active');
+}
+
+// Handle file selection
+async function handleFileSelect(e) {
+  const files = e.target.files;
+  if (!files || files.length === 0) return;
+  
+  for (let file of files) {
+    await uploadFile(file);
+  }
+  
+  // Clear file input
+  e.target.value = '';
+}
+
+// Upload file
+async function uploadFile(file) {
+  if (!activeChat) return;
+  
+  // Validate file size (max 50MB)
+  const maxSize = 50 * 1024 * 1024; // 50MB
+  if (file.size > maxSize) {
+    showToast('File too large. Maximum size is 50MB', 'error');
+    return;
+  }
+  
+  // Validate file type
+  const fileType = file.type.split('/')[0];
+  if (!['image', 'video', 'audio'].includes(fileType)) {
+    showToast('Only images, videos, and audio files are supported', 'error');
+    return;
+  }
+  
+  try {
+    // Show upload progress
+    showUploadProgress(file.name, 0);
+    
+    // Convert file to base64
+    const base64 = await fileToBase64(file);
+    
+    // Update progress
+    showUploadProgress(file.name, 50);
+    
+    // Create message
+    const messageId = push(ref(db, `messages/${activeChat.chatRoomId}`)).key;
+    const timestamp = Date.now();
+    
+    const messageData = {
+      text: file.name,
+      senderId: currentUser.uid,
+      timestamp,
+      status: 'sent',
+      type: fileType, // 'image', 'video', or 'audio'
+      fileData: base64,
+      fileName: file.name,
+      fileSize: file.size
+    };
+    
+    // Save to Firebase
+    await set(ref(db, `messages/${activeChat.chatRoomId}/${messageId}`), messageData);
+    
+    // Update chat room
+    await update(ref(db, `chatRooms/${activeChat.chatRoomId}`), {
+      lastMessage: {
+        text: fileType === 'image' ? '📷 Photo' : fileType === 'video' ? '🎥 Video' : '🎵 Audio',
+        senderId: currentUser.uid,
+        timestamp
+      },
+      [`unreadCount/${activeChat.friendId}`]: (chatRoomsData[activeChat.chatRoomId]?.unreadCount?.[activeChat.friendId] || 0) + 1
+    });
+    
+    // Update progress to 100%
+    showUploadProgress(file.name, 100);
+    
+    // Hide progress after 1 second
+    setTimeout(hideUploadProgress, 1000);
+    
+    // Update to delivered
+    setTimeout(async () => {
+      await update(ref(db, `messages/${activeChat.chatRoomId}/${messageId}`), {
+        status: 'delivered',
+        deliveredAt: Date.now()
+      });
+    }, 500);
+    
+    showToast(`${fileType.charAt(0).toUpperCase() + fileType.slice(1)} sent!`, 'success');
+    
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    showToast('Failed to upload file', 'error');
+    hideUploadProgress();
+  }
+}
+
+// Convert file to base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// Show upload progress
+function showUploadProgress(fileName, progress) {
+  let progressEl = document.getElementById('uploadProgress');
+  
+  if (!progressEl) {
+    progressEl = document.createElement('div');
+    progressEl.id = 'uploadProgress';
+    progressEl.className = 'upload-progress';
+    document.body.appendChild(progressEl);
+  }
+  
+  progressEl.innerHTML = `
+    <div class="upload-progress-header">
+      <span class="upload-progress-text">Uploading ${fileName}</span>
+      <span class="upload-progress-text">${progress}%</span>
+    </div>
+    <div class="upload-progress-bar">
+      <div class="upload-progress-fill" style="width: ${progress}%"></div>
+    </div>
+  `;
+}
+
+// Hide upload progress
+function hideUploadProgress() {
+  const progressEl = document.getElementById('uploadProgress');
+  if (progressEl) {
+    progressEl.style.animation = 'slideInRight 0.4s ease reverse';
+    setTimeout(() => progressEl.remove(), 400);
+  }
+}
+
+// Open media viewer
+function openMediaViewer(url, type, fileName) {
+  currentMediaUrl = url;
+  currentMediaType = type;
+  
+  const mediaViewer = document.getElementById('mediaViewer');
+  const mediaViewerContent = document.getElementById('mediaViewerContent');
+  
+  let mediaHtml = '';
+  
+  if (type === 'image') {
+    mediaHtml = `
+      <img src="${url}" alt="${fileName}">
+      <div class="media-viewer-controls">
+        <button class="media-viewer-btn" onclick="downloadMedia('${fileName}')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+      </div>
+    `;
+  } else if (type === 'video') {
+    mediaHtml = `
+      <video src="${url}" controls autoplay>
+        Your browser does not support the video tag.
+      </video>
+      <div class="media-viewer-controls">
+        <button class="media-viewer-btn" onclick="downloadMedia('${fileName}')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+      </div>
+    `;
+  }
+  
+  mediaViewerContent.innerHTML = mediaHtml;
+  mediaViewer.classList.add('active');
+}
+
+// Close media viewer
+function closeMediaViewer() {
+  const mediaViewer = document.getElementById('mediaViewer');
+  const mediaViewerContent = document.getElementById('mediaViewerContent');
+  
+  // Stop any playing video
+  const video = mediaViewerContent.querySelector('video');
+  if (video) {
+    video.pause();
+  }
+  
+  mediaViewer.classList.remove('active');
+  currentMediaUrl = null;
+  currentMediaType = null;
+}
+
+// Download media (needs to be in global scope)
+window.downloadMedia = function(fileName) {
+  if (!currentMediaUrl) return;
+  
+  const link = document.createElement('a');
+  link.href = currentMediaUrl;
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  showToast('Download started!', 'success');
+};
+
+// Play audio (needs to be in global scope)
+window.playAudio = function(button, audioSrc) {
+  const audio = new Audio(audioSrc);
+  const svg = button.querySelector('svg');
+  
+  // Pause icon
+  const pauseIcon = '<line x1="6" y1="4" x2="6" y2="20"/><line x1="18" y1="4" x2="18" y2="20"/>';
+  const playIcon = '<polygon points="5 3 19 12 5 21 5 3"/>';
+  
+  if (button.classList.contains('playing')) {
+    audio.pause();
+    button.classList.remove('playing');
+    svg.innerHTML = playIcon;
+  } else {
+    audio.play();
+    button.classList.add('playing');
+    svg.innerHTML = pauseIcon;
+    
+    audio.onended = () => {
+      button.classList.remove('playing');
+      svg.innerHTML = playIcon;
+    };
+  }
+};
+
+// Format file size
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+// Format audio duration
+function formatDuration(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
+}
+
+// queing variables
+let pendingMessages = {}; // Store messages being sent
+let messageQueue = []; // Queue for offline messages
+let isOnline = navigator.onLine;
+
+
+
+
     
     const newChatModal = document.getElementById('newChatModal');
     const closeModal = document.getElementById('closeModal');
@@ -1954,7 +2610,44 @@
       loadSentRequests();
       setupEventListeners();
       renderCurrentTab();
+
+      //online detection
+      setupOnlineDetection();
     }
+
+    // online detection
+    // Setup online/offline detection
+function setupOnlineDetection() {
+  window.addEventListener('online', () => {
+    isOnline = true;
+    console.log('Connection restored');
+    showToast('Back online - sending pending messages...', 'success');
+    processPendingMessages();
+  });
+  
+  window.addEventListener('offline', () => {
+    isOnline = false;
+    console.log('Connection lost');
+    showToast('You are offline. Messages will send when connection returns.', 'error');
+  });
+}
+
+// Process pending messages when back online
+async function processPendingMessages() {
+  if (messageQueue.length === 0) return;
+  
+  const messagesToSend = [...messageQueue];
+  messageQueue = [];
+  
+  for (const messageData of messagesToSend) {
+    try {
+      await sendMessageToFirebase(messageData);
+    } catch (error) {
+      console.error('Failed to send queued message:', error);
+      messageQueue.push(messageData); // Re-queue if failed
+    }
+  }
+}
     
     // Load all users
     function loadUsers() {
@@ -2170,6 +2863,73 @@
           sendMessage();
         }
       });
+
+
+
+      //sticker variable implementation
+
+      // Sticker picker
+const stickerBtn = document.getElementById('stickerBtn');
+const stickerPicker = document.getElementById('stickerPicker');
+
+stickerBtn.addEventListener('click', (e) => {
+  e.stopPropagation();
+  stickerPicker.classList.toggle('active');
+  if (stickerPicker.classList.contains('active')) {
+    renderStickers(currentStickerPack);
+  }
+});
+
+
+
+// Close sticker picker when clicking outside
+document.addEventListener('click', (e) => {
+  if (!stickerPicker.contains(e.target) && !stickerBtn.contains(e.target)) {
+    stickerPicker.classList.remove('active');
+  }
+});
+
+// Sticker tab switching
+document.querySelectorAll('.sticker-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.sticker-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentStickerPack = tab.dataset.pack;
+    renderStickers(currentStickerPack);
+  });
+});
+
+// File button
+const fileBtn = document.getElementById('fileBtn');
+const fileInput = document.getElementById('fileInput');
+
+if (fileBtn && fileInput) {
+  fileBtn.addEventListener('click', () => {
+    if (!activeChat) {
+      showToast('Please select a chat first', 'error');
+      return;
+    }
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', handleFileSelect);
+}
+
+// Media viewer
+const mediaViewer = document.getElementById('mediaViewer');
+const mediaViewerClose = document.getElementById('mediaViewerClose');
+
+if (mediaViewerClose) {
+  mediaViewerClose.addEventListener('click', closeMediaViewer);
+}
+
+if (mediaViewer) {
+  mediaViewer.addEventListener('click', (e) => {
+    if (e.target === mediaViewer) {
+      closeMediaViewer();
+    }
+  });
+}
 
       // Chat menu dropdown
       const chatMenuBtn = document.getElementById('chatMenuBtn');
@@ -2592,16 +3352,16 @@
         return;
       }
     
-    
-     // Sort friends by most recent message (both sent and received)
+      // Sort friends: unread first, then by most recent message
+      // Sort friends by most recent message (both sent and received)
       const sortedFriends = filteredFriends.sort((a, b) => {
       const chatRoomA = friends[a].chatRoomId;
       const chatRoomB = friends[b].chatRoomId;
   
   // Sort by most recent message timestamp
-     const lastMsgA = chatRoomsData[chatRoomA]?.lastMessage?.timestamp || 0;
-     const lastMsgB = chatRoomsData[chatRoomB]?.lastMessage?.timestamp || 0;
-     return lastMsgB - lastMsgA;
+      const lastMsgA = chatRoomsData[chatRoomA]?.lastMessage?.timestamp || 0;
+      const lastMsgB = chatRoomsData[chatRoomB]?.lastMessage?.timestamp || 0;
+      return lastMsgB - lastMsgA;
 });
     
       sortedFriends.forEach(friendId => {
@@ -2792,6 +3552,8 @@
           const showTimestamp = !lastMessageTime || (msg.timestamp - lastMessageTime) >= 180000;
           lastMessageTime = msg.timestamp;
           
+
+
           // Create message element
           const messageEl = document.createElement('div');
           messageEl.className = `message ${msg.senderId === currentUser.uid ? 'sent' : 'received'}`;
@@ -2833,19 +3595,50 @@
               `;
             }
           }
+          let bubbleContent = '';
+
+          if (msg.type === 'image') {
+            bubbleContent = `
+              <div class="message-bubble media-bubble">
+                <img src="${msg.fileData}" alt="${msg.fileName}" onclick="openMediaViewer('${msg.fileData}', 'image', '${msg.fileName}')">
+              </div>
+            `;
+          } else if (msg.type === 'video') {
+            bubbleContent = `
+              <div class="message-bubble media-bubble">
+                <video src="${msg.fileData}" onclick="openMediaViewer('${msg.fileData}', 'video', '${msg.fileName}')"></video>
+              </div>
+            `;
+          } else if (msg.type === 'audio') {
+            bubbleContent = `
+              <div class="message-bubble audio-bubble">
+                <div class="audio-player">
+                  <button class="audio-play-btn" onclick="playAudio(this, '${msg.fileData}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  </button>
+                  <div class="audio-info">
+                    <div class="audio-name">${msg.fileName}</div>
+                    <div class="audio-duration">${formatFileSize(msg.fileSize)}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+          } else {
+            bubbleContent = `<div class="message-bubble">${msg.text}</div>`;
+          }
           
           messageEl.innerHTML = `
-  <div class="message-avatar">
-    ${avatarHtml}
-  </div>
-  <div class="message-content">
-    <div class="message-bubble">${msg.text}</div>
-    <div class="message-footer">
-      <span class="message-time" style="${!showTimestamp ? 'display: none;' : ''}">${time}</span>
-      ${statusHtml}
-    </div>
-  </div>
-`;
+            <div class="message-avatar">
+              ${avatarHtml}
+            </div>
+            <div class="message-content">
+              ${bubbleContent}
+              <div class="message-footer">
+                <span class="message-time" style="${!showTimestamp ? 'display: none;' : ''}">${time}</span>
+                ${statusHtml}
+              </div>
+            </div>
+          `;
           
           messagesContainer.appendChild(messageEl);
         });
@@ -2859,58 +3652,119 @@
         }
       });
     }
-    
-    // Send message
-    async function sendMessage() {
-      const text = messageInput.value.trim();
-      if (!text || !activeChat) return;
-      
-      try {
-        const messageId = push(ref(db, `messages/${activeChat.chatRoomId}`)).key;
-        const timestamp = Date.now();
-        
-        // Add message
-        await set(ref(db, `messages/${activeChat.chatRoomId}/${messageId}`), {
-          text,
-          senderId: currentUser.uid,
-          timestamp,
-          status: 'sent'
-        });
-        
-        // Update chat room data
-        await update(ref(db, `chatRooms/${activeChat.chatRoomId}`), {
-          lastMessage: {
-            text,
-            senderId: currentUser.uid,
-            timestamp
-          },
-          [`unreadCount/${activeChat.friendId}`]: (chatRoomsData[activeChat.chatRoomId]?.unreadCount?.[activeChat.friendId] || 0) + 1
-        });
-        
-        // Update message status to delivered after a short delay
-        setTimeout(async () => {
-          await update(ref(db, `messages/${activeChat.chatRoomId}/${messageId}`), {
-            status: 'delivered',
-            deliveredAt: Date.now()
-          });
-        }, 500);
-        
-        // Clear input
-        messageInput.value = '';
-        messageInput.style.height = 'auto';
-        
-        // Clear typing status
-        setTypingStatus(false);
-        
-      } catch (error) {
-        console.error('Error sending message:', error);
-        showToast('Failed to send message', 'error');
-      }
-    }
+
+    // Send message - with offline support
+async function sendMessage() {
+  const text = messageInput.value.trim();
+  if (!text || !activeChat) return;
+  
+  const messageId = push(ref(db, `messages/${activeChat.chatRoomId}`)).key;
+  const timestamp = Date.now();
+  
+  const messageData = {
+    messageId,
+    chatRoomId: activeChat.chatRoomId,
+    text,
+    senderId: currentUser.uid,
+    timestamp,
+    friendId: activeChat.friendId,
+    status: 'pending'
+  };
+  
+  // Check if this message is already being sent (prevent duplicates)
+  const messageKey = `${activeChat.chatRoomId}_${text}_${timestamp}`;
+  if (pendingMessages[messageKey]) {
+    console.log('Message already being sent, ignoring duplicate');
+    return;
+  }
+  
+  // Mark as pending
+  pendingMessages[messageKey] = true;
+  
+  // Clear input immediately for better UX
+  messageInput.value = '';
+  messageInput.style.height = 'auto';
+  setTypingStatus(false);
+  
+  // Add message to UI immediately (optimistic update)
+  addMessageToUI(messageData);
+  
+  if (!isOnline) {
+    // Queue message for later
+    messageQueue.push(messageData);
+    showToast('Message queued - will send when online', 'error');
+    delete pendingMessages[messageKey];
+    return;
+  }
+  
+  try {
+    await sendMessageToFirebase(messageData);
+    delete pendingMessages[messageKey];
+  } catch (error) {
+    console.error('Error sending message:', error);
+    messageQueue.push(messageData);
+    showToast('Message queued - will retry', 'error');
+    delete pendingMessages[messageKey];
+  }
+}
+
+// Send message to Firebase
+async function sendMessageToFirebase(messageData) {
+  await set(ref(db, `messages/${messageData.chatRoomId}/${messageData.messageId}`), {
+    text: messageData.text,
+    senderId: messageData.senderId,
+    timestamp: messageData.timestamp,
+    status: 'sent',
+    type: 'text'
+  });
+  
+  // Update chat room data
+  await update(ref(db, `chatRooms/${messageData.chatRoomId}`), {
+    lastMessage: {
+      text: messageData.text,
+      senderId: messageData.senderId,
+      timestamp: messageData.timestamp
+    },
+    [`unreadCount/${messageData.friendId}`]: (chatRoomsData[messageData.chatRoomId]?.unreadCount?.[messageData.friendId] || 0) + 1
+  });
+  
+  // Update to delivered status
+  setTimeout(async () => {
+    await update(ref(db, `messages/${messageData.chatRoomId}/${messageData.messageId}`), {
+      status: 'delivered',
+      deliveredAt: Date.now()
+    });
+  }, 500);
+}
+
+// Add message to UI immediately (optimistic update)
+function addMessageToUI(messageData) {
+  const msgDate = new Date(messageData.timestamp);
+  const time = msgDate.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
+  
+  const messageEl = document.createElement('div');
+  messageEl.className = 'message sent';
+  messageEl.dataset.messageId = messageData.messageId;
+  
+  messageEl.innerHTML = `
+    <div class="message-avatar"></div>
+    <div class="message-content">
+      <div class="message-bubble">${messageData.text}</div>
+      <div class="message-footer">
+        <span class="message-time">${time}</span>
+        <div class="message-status sent">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+      </div>
+    </div>
+  `;
+  messagesContainer.appendChild(messageEl);
+  messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
   </script>
 </body>
 </html>
-
-
-
-
