@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Upload Tool - BlackBox</title>
+  <title>Upload - BlackBox</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     * {
@@ -99,6 +99,280 @@
       color: #555;
     }
 
+    .custom-select {
+      position: relative;
+      width: 100%;
+    }
+
+    .select-trigger {
+      width: 100%;
+      padding: 16px 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px solid #2a2a2a;
+      border-radius: 12px;
+      color: #ffffff;
+      font-size: 1.05em;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .select-trigger:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: #3a3a3a;
+    }
+
+    .select-trigger.active {
+      border-color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .select-trigger .placeholder {
+      color: #555;
+    }
+
+    .select-trigger .selected-value {
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .select-arrow {
+      width: 0;
+      height: 0;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-top: 6px solid #888;
+      transition: transform 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .select-trigger.active .select-arrow {
+      transform: rotate(180deg);
+    }
+
+    .select-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      right: 0;
+      background: #1a1a1a;
+      border: 2px solid #2a2a2a;
+      border-radius: 12px;
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    }
+
+    .select-dropdown.active {
+      max-height: 500px;
+      opacity: 1;
+      overflow-y: auto;
+    }
+
+    .select-dropdown::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .select-dropdown::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 4px;
+    }
+
+    .select-dropdown::-webkit-scrollbar-thumb {
+      background: #3a3a3a;
+      border-radius: 4px;
+    }
+
+    .select-option {
+      padding: 16px 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .select-option:last-child {
+      border-bottom: none;
+    }
+
+    .select-option:hover {
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .select-option.selected {
+      background: rgba(0, 255, 127, 0.1);
+      border-left: 3px solid #00ff7f;
+    }
+
+    .option-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .category-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      flex-shrink: 0;
+    }
+
+    .option-details {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .option-title {
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 1em;
+    }
+
+    .option-description {
+      color: #666;
+      font-size: 0.8em;
+    }
+
+    .category-title {
+      background: rgba(255, 255, 255, 0.05);
+      border-left: 4px solid #4a4a4a;
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .category-title-icon {
+      font-size: 2em;
+    }
+
+    .category-title-text h3 {
+      color: #ffffff;
+      font-size: 1.3em;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .category-title-text p {
+      color: #888;
+      font-size: 0.9em;
+    }
+
+    .field-hint {
+      color: #666;
+      font-size: 0.85em;
+      margin-top: 6px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+      line-height: 1.5;
+    }
+
+    .tag-input-wrapper {
+      margin-top: 10px;
+    }
+
+    .tag-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+      min-height: 40px;
+      padding: 8px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+    }
+
+    .tag {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .tag:hover {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.08));
+    }
+
+    .tag-text {
+      font-weight: 500;
+    }
+
+    .tag-remove {
+      cursor: pointer;
+      color: #ff4444;
+      font-weight: bold;
+      font-size: 1.1em;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255, 68, 68, 0.1);
+    }
+
+    .tag-remove:hover {
+      background: rgba(255, 68, 68, 0.2);
+      transform: scale(1.1);
+    }
+
+    .tag-input-field {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tag-input-field input {
+      flex: 1;
+    }
+
+    .add-tag-btn {
+      padding: 14px 24px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .add-tag-btn:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #4a4a4a;
+    }
+
     .image-upload-area {
       width: 100%;
       min-height: 200px;
@@ -124,14 +398,11 @@
       border-style: solid;
     }
 
-    .upload-icon {
-      margin-bottom: 16px;
-    }
-
     .upload-icon svg {
       width: 48px;
       height: 48px;
       color: #666;
+      margin-bottom: 16px;
     }
 
     .upload-text {
@@ -158,43 +429,6 @@
 
     .file-input {
       display: none;
-    }
-
-    .token-input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .token-icon {
-      position: absolute;
-      left: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      pointer-events: none;
-    }
-
-    .token-icon svg {
-      width: 20px;
-      height: 20px;
-      color: #888;
-    }
-
-    .token-input {
-      padding-left: 90px;
-    }
-
-    .price-display {
-      margin-top: 8px;
-      color: #888;
-      font-size: 0.9em;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
     }
 
     .submit-btn {
@@ -224,18 +458,10 @@
       transform: translateY(-2px);
     }
 
-    .submit-btn:active {
-      transform: translateY(0);
-    }
-
     .submit-btn:disabled {
       opacity: 0.5;
       cursor: not-allowed;
-    }
-
-    .submit-btn svg {
-      width: 20px;
-      height: 20px;
+      transform: none;
     }
 
     .cancel-btn {
@@ -278,11 +504,6 @@
       gap: 8px;
     }
 
-    .info-box-title svg {
-      width: 18px;
-      height: 18px;
-    }
-
     .info-box-text {
       color: #888;
       font-size: 0.9em;
@@ -294,417 +515,610 @@
         padding: 20px 15px;
       }
 
-      .header h1 {
-        font-size: 2em;
-      }
-
       .upload-section {
         padding: 24px 20px;
       }
 
-      .form-row {
-        grid-template-columns: 1fr;
+      .tag-input-field {
+        flex-direction: column;
       }
 
-      .image-upload-area {
-        min-height: 180px;
+      .add-tag-btn {
+        width: 100%;
+        justify-content: center;
       }
 
-      .upload-icon svg {
-        width: 40px;
-        height: 40px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .header h1 {
-        font-size: 1.8em;
-      }
-
-      .token-input {
-        padding-left: 80px;
-      }
-
-      .token-icon {
-        left: 12px;
+      .option-description {
+        display: none;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <br>
     <div class="header">
-      <h1>Upload New Tool</h1>
-      <p>Share your tools with the BlackBox community</p>
+      <h1>Upload Your Work</h1>
+      <p>Share your creations with the BlackBox community</p>
     </div>
+
     <div class="upload-section">
       <div class="info-box">
         <div class="info-box-title">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          Guidelines
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          Upload Guidelines
         </div>
         <div class="info-box-text">
-          Make sure your tool is properly tested and documented. Include clear descriptions and set a fair price in tokens.
+          Select your category and fill in all required fields. Make sure your files are properly formatted and documented.
         </div>
       </div>
 
       <form id="uploadForm">
         <div class="form-group">
-          <label class="form-label">Tool Name</label>
-          <input 
-            type="text" 
-            class="form-input" 
-            placeholder="e.g., SecureVault Pro"
-            id="tool_name"
-            required
-          />
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Description</label>
-          <textarea 
-            class="form-textarea" 
-            placeholder="Describe what your tool does and its key features..."
-            id="description"
-            required
-          ></textarea>
-        </div>
-        <!-- Newly added code -->
-        <div class="form-group">
-          <label class="form-label">HOW TO USE</label>
-          <textarea 
-            class="form-textarea" 
-            placeholder="Paste youtube tutorial link or detailed explanation on tool usage."
-            id="usage"
-            required
-          ></textarea>
-          <div class="price-display" style="margin-top: 8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            Give a detailed info on how to use your tool or paste a youtube tutorial link
-          </div>
-        </div>
-        
-        <!-- Ends here -->
-
-        <div class="form-group">
-          <label class="form-label">Tool Image</label>
-          <div class="image-upload-area" id="imageUploadArea">
-            <div class="upload-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          <label class="form-label">Select Category</label>
+          <div class="custom-select">
+            <div class="select-trigger" id="categoryTrigger">
+              <span class="placeholder">Choose a category...</span>
+              <div class="select-arrow"></div>
             </div>
-            <div class="upload-text">Click to upload image</div>
-            <div class="upload-subtext">PNG, JPG up to 5MB</div>
-            <img id="imagePreview" class="image-preview" alt="Preview">
-          </div>
-          <input 
-            type="file" 
-            class="file-input" 
-            id="fileInput" 
-            accept="image/*"
-          />
-        </div>
-
-        <div class="form-row">
-          
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">Price (Tokens)</label>
-          <div class="token-input-wrapper">
-            <div class="token-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="12" y1="2" x2="12" y2="6"/></svg>
-              <span style="color: #888; font-size: 0.9em;">Tokens</span>
+            <div class="select-dropdown" id="categoryDropdown">
+              <div class="select-option" data-value="developer">
+                <div class="option-content">
+                  <div class="category-icon">🔧</div>
+                  <div class="option-details">
+                    <div class="option-title">Developer Tools</div>
+                    <div class="option-description">Apps, scripts, and development tools</div>
+                  </div>
+                </div>
+              </div>
+              <div class="select-option" data-value="design">
+                <div class="option-content">
+                  <div class="category-icon">🎨</div>
+                  <div class="option-details">
+                    <div class="option-title">Design Projects</div>
+                    <div class="option-description">Creative design work and projects</div>
+                  </div>
+                </div>
+              </div>
+              <div class="select-option" data-value="uiux">
+                <div class="option-content">
+                  <div class="category-icon">💻</div>
+                  <div class="option-details">
+                    <div class="option-title">UI/UX Design</div>
+                    <div class="option-description">Interface designs and user experiences</div>
+                  </div>
+                </div>
+              </div>
+              <div class="select-option" data-value="animation">
+                <div class="option-content">
+                  <div class="category-icon">🎬</div>
+                  <div class="option-details">
+                    <div class="option-title">Animation</div>
+                    <div class="option-description">Animations and motion graphics</div>
+                  </div>
+                </div>
+              </div>
+              <div class="select-option" data-value="vr">
+                <div class="option-content">
+                  <div class="category-icon">🥽</div>
+                  <div class="option-details">
+                    <div class="option-title">Virtual Reality</div>
+                    <div class="option-description">VR experiences and applications</div>
+                  </div>
+                </div>
+              </div>
+              <div class="select-option" data-value="ai">
+                <div class="option-content">
+                  <div class="category-icon">🤖</div>
+                  <div class="option-details">
+                    <div class="option-title">AI Strategy</div>
+                    <div class="option-description">AI strategies and implementations</div>
+                  </div>
+                </div>
+              </div>
             </div>
-            <input 
-              type="number" 
-              class="form-input token-input" 
-              id="priceInput"
-              placeholder="0"
-              min="0"
-              required
-            />
           </div>
-          <div class="price-display" id="priceDisplay">Free</div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Download Link</label>
-          <input 
-            type="url" 
-            class="form-input" 
-            placeholder="https://example.com/your-tool.apk"
-            id="download"
-            required
-          />
-          <div class="price-display" style="margin-top: 8px;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline-block; vertical-align: middle; margin-right: 6px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            Paste the direct download link to your already hosted APK file
-          </div>
-        </div>
+        <div id="categoryFieldsContainer"></div>
 
         <button type="submit" class="submit-btn" id="submitBtn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Upload Tool
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload
         </button>
 
         <button type="button" class="cancel-btn" onclick="history.back()">
           Cancel
         </button>
       </form>
-      <br>
     </div>
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
-    import { ref, get, set, getDatabase } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
-    import { onAuthStateChanged, getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
-    
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, push, set, get } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  
     const firebaseConfig = {
       apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
       authDomain: "uamtv-c031c.firebaseapp.com",
       databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
       projectId: "uamtv-c031c",
-      storageBucket: "uamtv-c031c.firebasestorage.app",
+      storageBucket: "uamtv-c031c.appspot.com",
       messagingSenderId: "9790917697",
-      appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
-      measurementId: "G-RSXW1XBVQZ"
+      appId: "1:9790917697:web:275c8347b7688e0ac38ac0"
     };
-    
+  
     const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
     const auth = getAuth(app);
-    const db = getDatabase();
-    
-    console.log('🔥 Firebase initialized:', app.name);
-
-    // Get DOM elements
-    const imageUploadArea = document.getElementById('imageUploadArea');
-    const fileInput = document.getElementById('fileInput');
-    const imagePreview = document.getElementById('imagePreview');
-    const priceInput = document.getElementById('priceInput');
-    const priceDisplay = document.getElementById('priceDisplay');
-    const uploadForm = document.getElementById('uploadForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const download = document.getElementById("download");
-    const tool_name = document.getElementById("tool_name");
-    const description = document.getElementById("description");
-    const usage = document.getElementById("usage");
-
-    let selectedImageBase64 = null;
-    let currentUserData = null;
-
-    // 🆕 FETCH USER DATA WHEN AUTH STATE CHANGES
-    onAuthStateChanged(auth, async (user) => {
+    console.log('✅ Firebase Ready');
+  
+    let currentUser = null;
+  
+    // Check authentication
+    onAuthStateChanged(auth, (user) => {
       if (user) {
+        currentUser = user;
         console.log('✅ User logged in:', user.uid);
-        
-        try {
-          const userRef = ref(db, `users/${user.uid}`);
-          const userSnapshot = await get(userRef);
-          
-          if (userSnapshot.exists()) {
-            const userData = userSnapshot.val();
-            currentUserData = {
-              uid: user.uid,
-              nickname: userData.nickname || 'Anonymous',
-              avatar: userData.avatar || '',
-              role: userData.role || 'User'
-            };
-            console.log('✅ User data loaded:', currentUserData);
-          } else {
-            console.warn('⚠️ User data not found in database');
-            currentUserData = {
-              uid: user.uid,
-              nickname: 'Anonymous',
-              avatar: '',
-              role: 'User'
-            };
-          }
-        } catch (error) {
-          console.error('❌ Error fetching user data:', error);
-        }
       } else {
+        currentUser = null;
         console.log('⚠️ No user logged in');
-        currentUserData = null;
-        // Optionally redirect to login
-        // window.location.href = './login.html';
       }
     });
+  
 
-    // Click to upload image
-    imageUploadArea.addEventListener('click', () => {
-      fileInput.click();
+    const categoryFields = {
+      developer: {
+        title: '🔧 Developer Tools',
+        description: 'Upload your apps, scripts, and development tools',
+        fields: [
+          { type: 'text', name: 'toolName', label: 'Tool Name', placeholder: 'e.g., SecureVault Pro', required: true },
+          { type: 'textarea', name: 'about', label: 'About', placeholder: 'What is this tool about?', required: true },
+          { type: 'textarea', name: 'description', label: 'Description', placeholder: 'Detailed description...', required: true },
+          { type: 'textarea', name: 'howToUse', label: 'How To Use', placeholder: 'Step-by-step instructions...', required: true },
+          { type: 'image', name: 'toolImage', label: 'Tool Image', required: true },
+          { type: 'number', name: 'price', label: 'Price (Tokens)', placeholder: '0', required: true },
+          { type: 'url', name: 'downloadLink', label: 'Download Link', placeholder: 'https://github.com/user/repo/releases/download/file.zip', required: true }
+        ]
+      },
+      design: {
+        title: '🎨 Design Projects',
+        description: 'Share your design work',
+        fields: [
+          { type: 'text', name: 'projectName', label: 'Project Name', placeholder: 'e.g., Brand Identity', required: true },
+          { type: 'textarea', name: 'description', label: 'Description', placeholder: 'Describe your project...', required: true },
+          { type: 'tags', name: 'toolsUsed', label: 'Tools Used', placeholder: 'e.g., Illustrator', required: false },
+          { type: 'image', name: 'projectImage', label: 'Project Image', required: true },
+          { type: 'number', name: 'price', label: 'Price (Tokens)', placeholder: '0', required: true },
+          { type: 'url', name: 'downloadLink', label: 'Design Files Link', placeholder: 'https://figma.com/file/... or Google Drive link', required: true } 
+        ]
+      },
+      uiux: {
+        title: '💻 UI/UX Design',
+        description: 'Upload interface designs',
+        fields: [
+          { type: 'text', name: 'projectName', label: 'Project Name', placeholder: 'e.g., Banking App', required: true },
+          { type: 'textarea', name: 'description', label: 'Overview', placeholder: 'Describe the UX...', required: true },
+          { type: 'url', name: 'prototypeLink', label: 'Prototype Link', placeholder: 'Figma/Adobe XD link', required: true },
+          { type: 'image', name: 'coverImage', label: 'Cover Image', required: true },
+          { type: 'number', name: 'price', label: 'Price (Tokens)', placeholder: '0', required: true },
+          { type: 'url', name: 'downloadLink', label: 'Design Files Link', placeholder: 'https://figma.com/file/... or download link', required: true } 
+        ]
+      },
+      animation: {
+        title: '🎬 Animation',
+        description: 'Share animations',
+        fields: [
+          { type: 'text', name: 'animationTitle', label: 'Title', placeholder: 'e.g., Product Animation', required: true },
+          { type: 'textarea', name: 'description', label: 'Description', placeholder: 'Describe...', required: true },
+          { type: 'url', name: 'videoLink', label: 'Preview Video Link', placeholder: 'YouTube/Vimeo link', required: true },
+          { type: 'image', name: 'thumbnail', label: 'Thumbnail', required: true },
+          { type: 'number', name: 'price', label: 'Price (Tokens)', placeholder: '0', required: true },
+          { type: 'url', name: 'downloadLink', label: 'Animation Files Link', placeholder: 'https://drive.google.com/... or direct download', required: true } 
+        ]
+      },
+      vr: {
+        title: '🥽 Virtual Reality',
+        description: 'Upload VR experiences',
+        fields: [
+          { type: 'text', name: 'projectName', label: 'VR Project', placeholder: 'e.g., Museum Tour', required: true },
+          { type: 'textarea', name: 'description', label: 'Description', placeholder: 'Describe...', required: true },
+          { type: 'url', name: 'demoVideo', label: 'Demo Video', placeholder: 'YouTube link', required: true },
+          { type: 'image', name: 'coverImage', label: 'Cover Image', required: true },
+          { type: 'url', name: 'downloadLink', label: 'VR App Download Link', placeholder: 'https://store.steampowered.com/... or direct download', required: true }, 
+          { type: 'number', name: 'price', label: 'Price (Tokens)', placeholder: '0', required: true }
+        ]
+      },
+      ai: {
+        title: '🤖 AI Strategy',
+        description: 'Share AI strategies',
+        fields: [
+          { type: 'text', name: 'strategyTitle', label: 'Title', placeholder: 'e.g., AI Support System', required: true },
+          { type: 'textarea', name: 'overview', label: 'Overview', placeholder: 'Describe the strategy...', required: true },
+          { type: 'url', name: 'documentation', label: 'Documentation Link', placeholder: 'Notion/Google Docs link', required: true },
+          { type: 'image', name: 'coverImage', label: 'Cover Image', required: true },
+          { type: 'number', name: 'price', label: 'Price (Tokens)', placeholder: '0', required: true },
+          { type: 'url', name: 'downloadLink', label: 'Strategy Files Link', placeholder: 'https://drive.google.com/... or PDF download', required: true } 
+        ]
+      }
+    };
+
+
+
+
+  
+    let selectedImageBase64 = null;
+    let tagInputs = {};
+    let selectedCategory = 'developer';
+  
+    const categoryTrigger = document.getElementById('categoryTrigger');
+    const categoryDropdown = document.getElementById('categoryDropdown');
+    const categoryOptions = document.querySelectorAll('.select-option');
+    const fieldsContainer = document.getElementById('categoryFieldsContainer');
+    const uploadForm = document.getElementById('uploadForm');
+  
+    renderCategoryFields('developer');
+  
+    categoryTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      categoryTrigger.classList.toggle('active');
+      categoryDropdown.classList.toggle('active');
     });
-
-    // Handle file selection
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          selectedImageBase64 = e.target.result;
-          imagePreview.src = selectedImageBase64;
-          imagePreview.classList.add('show');
-          imageUploadArea.classList.add('has-image');
-          imageUploadArea.querySelector('.upload-icon').style.display = 'none';
-          imageUploadArea.querySelector('.upload-text').style.display = 'none';
-          imageUploadArea.querySelector('.upload-subtext').style.display = 'none';
-          console.log('✅ Image stored');
-        };
-        reader.readAsDataURL(file);
+  
+    document.addEventListener('click', (e) => {
+      if (!categoryTrigger.contains(e.target) && !categoryDropdown.contains(e.target)) {
+        categoryTrigger.classList.remove('active');
+        categoryDropdown.classList.remove('active');
       }
     });
-
-    // Update price display
-    priceInput.addEventListener('input', (e) => {
-      const value = parseInt(e.target.value) || 0;
-      priceDisplay.textContent = value === 0 ? 'Free' : `${value.toLocaleString()} tokens`;
+  
+    categoryOptions.forEach(option => {
+      option.addEventListener('click', function() {
+        categoryOptions.forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        
+        const category = this.getAttribute('data-value');
+        selectedCategory = category;
+        
+        const optionHTML = this.querySelector('.option-content').innerHTML;
+        categoryTrigger.innerHTML = `
+          <div class="selected-value">${optionHTML}</div>
+          <div class="select-arrow"></div>
+        `;
+        
+        categoryTrigger.classList.remove('active');
+        categoryDropdown.classList.remove('active');
+        
+        renderCategoryFields(category);
+      });
     });
-
-    // 🆕 GENERATE TOOL ID
-    function generateToolId(length = 7) {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let id = '';
-      for (let i = 0; i < length; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return id;
+  
+    function renderCategoryFields(category) {
+      const config = categoryFields[category];
+      if (!config) return;
+  
+      fieldsContainer.innerHTML = '';
+      selectedImageBase64 = null;
+      tagInputs = {};
+  
+      const titleDiv = document.createElement('div');
+      titleDiv.className = 'category-title';
+      titleDiv.innerHTML = `
+        <div class="category-title-icon">${config.title.split(' ')[0]}</div>
+        <div class="category-title-text">
+          <h3>${config.title.substring(3)}</h3>
+          <p>${config.description}</p>
+        </div>
+      `;
+      fieldsContainer.appendChild(titleDiv);
+  
+      config.fields.forEach(field => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.className = 'form-group';
+  
+        if (field.type === 'text' || field.type === 'url' || field.type === 'number') {
+          fieldDiv.innerHTML = `
+            <label class="form-label">${field.label}${field.required ? ' *' : ''}</label>
+            <input 
+              type="${field.type}" 
+              class="form-input" 
+              name="${field.name}"
+              placeholder="${field.placeholder}"
+              ${field.required ? 'required' : ''}
+              ${field.type === 'number' ? 'min="0"' : ''}
+            />
+          `;
+        } else if (field.type === 'textarea') {
+          fieldDiv.innerHTML = `
+            <label class="form-label">${field.label}${field.required ? ' *' : ''}</label>
+            <textarea 
+              class="form-textarea" 
+              name="${field.name}"
+              placeholder="${field.placeholder}"
+              ${field.required ? 'required' : ''}
+            ></textarea>
+          `;
+        } else if (field.type === 'tags') {
+          fieldDiv.innerHTML = `
+            <label class="form-label">${field.label}${field.required ? ' *' : ''}</label>
+            <div class="tag-input-wrapper">
+              <div class="tag-container" id="tagContainer-${field.name}"></div>
+              <div class="tag-input-field">
+                <input 
+                  type="text" 
+                  class="form-input" 
+                  id="tagInput-${field.name}"
+                  placeholder="${field.placeholder}"
+                />
+                <button type="button" class="add-tag-btn" onclick="addTag('${field.name}')">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add
+                </button>
+              </div>
+            </div>
+          `;
+          tagInputs[field.name] = [];
+        } else if (field.type === 'image') {
+          fieldDiv.innerHTML = `
+            <label class="form-label">${field.label}${field.required ? ' *' : ''}</label>
+            <div class="image-upload-area" id="imageUploadArea-${field.name}">
+              <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+              </div>
+              <div class="upload-text">Click to upload image</div>
+              <div class="upload-subtext">PNG, JPG up to 1MB</div>
+              <img id="imagePreview-${field.name}" class="image-preview" alt="Preview">
+            </div>
+            <input 
+              type="file" 
+              class="file-input" 
+              id="fileInput-${field.name}" 
+              accept="image/*"
+              ${field.required ? 'required' : ''}
+            />
+          `;
+        }
+  
+        fieldsContainer.appendChild(fieldDiv);
+      });
+  
+      setupImageUpload();
     }
-
-    // 🆕 HANDLE FORM SUBMISSION WITH USER DATA
+  
+    function setupImageUpload() {
+      const imageFields = fieldsContainer.querySelectorAll('[id^="imageUploadArea-"]');
+      
+      imageFields.forEach(uploadArea => {
+        const fieldName = uploadArea.id.replace('imageUploadArea-', '');
+        const fileInput = document.getElementById(`fileInput-${fieldName}`);
+        const imagePreview = document.getElementById(`imagePreview-${fieldName}`);
+  
+        if (!uploadArea || !fileInput) return;
+  
+        uploadArea.addEventListener('click', () => {
+          fileInput.click();
+        });
+  
+        fileInput.addEventListener('change', (e) => {
+          const file = e.target.files[0];
+          if (file) {
+            handleImageFile(file, imagePreview, uploadArea);
+          }
+        });
+  
+        uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.style.borderColor = '#4a4a4a';
+          uploadArea.style.background = 'rgba(255, 255, 255, 0.05)';
+        });
+  
+        uploadArea.addEventListener('dragleave', () => {
+          uploadArea.style.borderColor = '#2a2a2a';
+          uploadArea.style.background = 'rgba(255, 255, 255, 0.03)';
+        });
+  
+        uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.style.borderColor = '#2a2a2a';
+          uploadArea.style.background = 'rgba(255, 255, 255, 0.03)';
+          
+          const file = e.dataTransfer.files[0];
+          if (file && file.type.startsWith('image/')) {
+            handleImageFile(file, imagePreview, uploadArea);
+          }
+        });
+      });
+    }
+  
+    function handleImageFile(file, previewEl, uploadAreaEl) {
+      if (file.size > 1 * 1024 * 1024) {
+        alert('Image size must be less than 1MB for database storage');
+        return;
+      }
+  
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        selectedImageBase64 = e.target.result;
+        previewEl.src = selectedImageBase64;
+        previewEl.classList.add('show');
+        uploadAreaEl.classList.add('has-image');
+        
+        const icon = uploadAreaEl.querySelector('.upload-icon');
+        const text = uploadAreaEl.querySelector('.upload-text');
+        const subtext = uploadAreaEl.querySelector('.upload-subtext');
+        if (icon) icon.style.display = 'none';
+        if (text) text.style.display = 'none';
+        if (subtext) subtext.style.display = 'none';
+      };
+      reader.readAsDataURL(file);
+    }
+  
+    window.addTag = function(fieldName) {
+      const input = document.getElementById(`tagInput-${fieldName}`);
+      const container = document.getElementById(`tagContainer-${fieldName}`);
+      
+      if (!input || !container) return;
+      
+      const value = input.value.trim();
+      if (!value) return;
+      
+      if (tagInputs[fieldName].includes(value)) {
+        alert('This tag already exists');
+        return;
+      }
+      
+      tagInputs[fieldName].push(value);
+      
+      const tag = document.createElement('div');
+      tag.className = 'tag';
+      tag.innerHTML = `
+        <span class="tag-text">${value}</span>
+        <span class="tag-remove" onclick="removeTag('${fieldName}', '${value}')">×</span>
+      `;
+      
+      container.appendChild(tag);
+      input.value = '';
+    };
+  
+    window.removeTag = function(fieldName, value) {
+      const container = document.getElementById(`tagContainer-${fieldName}`);
+      if (!container) return;
+      
+      tagInputs[fieldName] = tagInputs[fieldName].filter(tag => tag !== value);
+      
+      const tags = container.querySelectorAll('.tag');
+      tags.forEach(tag => {
+        if (tag.querySelector('.tag-text').textContent === value) {
+          tag.remove();
+        }
+      });
+    };
+  
+    document.addEventListener('keypress', (e) => {
+      if (e.target.id && e.target.id.startsWith('tagInput-') && e.key === 'Enter') {
+        e.preventDefault();
+        const fieldName = e.target.id.replace('tagInput-', '');
+        addTag(fieldName);
+      }
+    });
+  
+    // 🆕 GENERATE 7-CHARACTER RANDOM ID (e.g., ER56L3R)
+    function generateToolId() {
+      const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < 7; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+      return result;
+    }
+  
     uploadForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       
       // Check if user is logged in
-      if (!currentUserData || !auth.currentUser) {
-        alert('Please log in to upload tools');
+      if (!currentUser) {
+        alert('⚠️ Please login to upload tools!');
         return;
       }
       
-      // Check if image was selected
       if (!selectedImageBase64) {
-        alert('Please select an image for your tool');
+        alert('Please upload an image');
         return;
       }
       
-      // Get form values
-      const name = tool_name.value.trim();
-      const description_info = description.value.trim();
-      const tokens = parseInt(priceInput.value) || 0;
-      const download_link = download.value.trim();
-      const toolId = generateToolId();
-      const usage_link = usage.value.trim();
-      
-      
-      // Disable submit button
+      const submitBtn = document.getElementById('submitBtn');
       submitBtn.disabled = true;
-      submitBtn.textContent = 'Uploading...';
-      
-      // 🆕 CREATE TOOL DATA WITH USER INFORMATION
-      const toolData = {
-        name: name,
-        description: description_info,
-        price: tokens,
-        downloadUrl: download_link,
-        image: selectedImageBase64,
-        uploadedAt: Date.now(),
-        uploadedBy: currentUserData.uid,
-        uploaderName: currentUserData.nickname,
-        uploaderAvatar: currentUserData.avatar,
-        uploaderRole: currentUserData.role,
-        toolId: toolId,
-        downloads: 0,
-        tool_usage: usage_link,
-        howToUse: usage
-      };
-      
-      console.log('📤 Uploading tool:', toolData);
+      submitBtn.innerHTML = '<span>Uploading...</span>';
       
       try {
-        // 🆕 SAVE TO: tools/{userId}/{toolId}
-        await set(ref(db, `tools/${currentUserData.uid}/${toolId}`), toolData);
+        // 🆕 FETCH USER DATA FROM DATABASE
+        const userRef = ref(database, `users/${currentUser.uid}`);
+        const userSnapshot = await get(userRef);
         
-        console.log('✅ Tool uploaded successfully!');
-        alert('Tool uploaded successfully!');
+        let uploaderName = 'Anonymous';
+        let uploaderAvatar = selectedImageBase64;
+        
+        if (userSnapshot.exists()) {
+          const userData = userSnapshot.val();
+          uploaderName = userData.nickname || 'Anonymous';
+          uploaderAvatar = userData.avatar || userData.photoURL || selectedImageBase64;
+        }
+        
+        console.log('👤 Uploader:', uploaderName);
+        
+        // 🆕 GENERATE 7-CHARACTER ID (letters and numbers)
+        const toolId = generateToolId();
+        console.log('🆔 Tool ID:', toolId);
+        
+        // Collect all form data
+        const formData = {};
+        const inputs = uploadForm.querySelectorAll('input:not([type="file"]), textarea');
+        inputs.forEach(input => {
+          if (input.name) {
+            formData[input.name] = input.value;
+          }
+        });
+        
+        // Add tags
+        Object.keys(tagInputs).forEach(key => {
+          if (tagInputs[key].length > 0) {
+            formData[key] = tagInputs[key];
+          }
+        });
+        
+        // Prepare tool data in the format market.js expects
+        const toolData = {
+          toolId: toolId,
+          name: formData.toolName || formData.projectName || formData.animationTitle || formData.strategyTitle,
+          description: formData.description || formData.overview || formData.about,
+          price: parseInt(formData.price) || 0,
+          image: selectedImageBase64,  // Tool's main image
+          tool_usage: formData.howToUse || formData.description,
+          category: selectedCategory,
+          uploadedAt: Date.now(),
+          timestamp: new Date().toISOString(),
+          uploaderName: uploaderName,  // 🆕 Real user name
+          uploaderAvatar: uploaderAvatar,  // 🆕 Real user avatar
+          downloadCount: 0,
+          ...formData  // Include all other fields
+        };
+        
+        // Save to tools/{userId}/{toolId}
+        submitBtn.innerHTML = '<span>Uploading Tool...</span>';
+        const toolRef = ref(database, `tools/${currentUser.uid}/${toolId}`);
+        
+        await set(toolRef, toolData);
+        
+        console.log('✅ Upload successful!', toolData);
+        alert('✅ Upload successful!\n\nTool ID: ' + toolId + '\nCategory: ' + selectedCategory + '\nYour tool is now live in the marketplace!');
         
         // Reset form
-        resetForm();
+        uploadForm.reset();
+        selectedImageBase64 = null;
+        tagInputs = {};
+        selectedCategory = 'developer';
+        renderCategoryFields('developer');
         
-        // Optionally redirect to profile
-        // setTimeout(() => {
-        //   window.location.href = './profile.html';
-        // }, 1000);
+        // Reset category dropdown
+        categoryOptions.forEach(opt => opt.classList.remove('selected'));
+        categoryTrigger.innerHTML = `
+          <span class="placeholder">Choose a category...</span>
+          <div class="select-arrow"></div>
+        `;
         
       } catch (error) {
-        console.error('❌ Upload error:', error);
-        alert('Upload failed: ' + error.message);
+        console.error('Upload error:', error);
+        alert('❌ Upload failed: ' + error.message);
       } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = `
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          Upload Tool
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Upload
         `;
       }
     });
-
-
-
-
-
-
-
-
-
-    
-
-    // Function to reset the form
-    function resetForm() {
-      uploadForm.reset();
-      selectedImageBase64 = null;
-      imagePreview.classList.remove('show');
-      imageUploadArea.classList.remove('has-image');
-      imageUploadArea.querySelector('.upload-icon').style.display = 'block';
-      imageUploadArea.querySelector('.upload-text').style.display = 'block';
-      imageUploadArea.querySelector('.upload-subtext').style.display = 'block';
-      priceDisplay.textContent = 'Free';
-      console.log('✅ Form reset');
-    }
-
-    // Drag and drop functionality
-    imageUploadArea.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      imageUploadArea.style.borderColor = '#4a4a4a';
-      imageUploadArea.style.background = 'rgba(255, 255, 255, 0.05)';
-    });
-
-    imageUploadArea.addEventListener('dragleave', () => {
-      imageUploadArea.style.borderColor = '#2a2a2a';
-      imageUploadArea.style.background = 'rgba(255, 255, 255, 0.03)';
-    });
-
-    imageUploadArea.addEventListener('drop', (e) => {
-      e.preventDefault();
-      imageUploadArea.style.borderColor = '#2a2a2a';
-      imageUploadArea.style.background = 'rgba(255, 255, 255, 0.03)';
-      
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith('image/')) {
-        fileInput.files = e.dataTransfer.files;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          selectedImageBase64 = e.target.result;
-          imagePreview.src = selectedImageBase64;
-          imagePreview.classList.add('show');
-          imageUploadArea.classList.add('has-image');
-          imageUploadArea.querySelector('.upload-icon').style.display = 'none';
-          imageUploadArea.querySelector('.upload-text').style.display = 'none';
-          imageUploadArea.querySelector('.upload-subtext').style.display = 'none';
-          console.log('✅ Image stored (drag & drop)');
-        };
-        reader.readAsDataURL(file);
-      }
-    });
   </script>
+
 </body>
 </html>
+       
