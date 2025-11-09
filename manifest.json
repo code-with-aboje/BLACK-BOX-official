@@ -1,15 +1,12 @@
-
-
 {
-  "name": "Black Box",
-  "short_name": "Black Box",
-  "description": "black box",
+  "name": "BlackBox",
+  "short_name": "BlackBox",
+  "description": "Where secrets become power",
   "start_url": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
   "background_color": "#000000",
   "theme_color": "#000000",
-  "categories": ["Tech", "graphics", "productivity"],
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -24,5 +21,4 @@
       "purpose": "any maskable"
     }
   ]
-    }
-
+}
