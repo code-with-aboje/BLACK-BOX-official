@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notifications - BlackBox</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: #0a0a0a;
+      color: #e0e0e0;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .header {
+      text-align: center;
+      padding: 30px 0;
+      margin-bottom: 40px;
+    }
+
+    .header-title {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .header h1 {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -1px;
+      margin: 0;
+    }
+
+    .header p {
+      color: #888;
+      font-size: 1.05em;
+    }
+
+    .notifications-section {
+      background: linear-gradient(135deg, #1a1a1a, #141414);
+      border: 1px solid #2a2a2a;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .section-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .notification-count-badge {
+      background: linear-gradient(135deg, #ff0050, #ff4081);
+      color: #fff;
+      font-size: 0.85em;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 20px;
+      min-width: 24px;
+      text-align: center;
+      display: none;
+    }
+
+    .notification-count-badge.show {
+      display: inline-block;
+    }
+
+    .section-title {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+
+    .mark-all-btn {
+      padding: 10px 20px;
+      background: rgba(0, 255, 127, 0.1);
+      border: 1px solid rgba(0, 255, 127, 0.3);
+      border-radius: 8px;
+      color: #00ff7f;
+      font-weight: 600;
+      font-size: 0.9em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .mark-all-btn:hover {
+      background: rgba(0, 255, 127, 0.2);
+      border-color: #00ff7f;
+    }
+
+    .notifications-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .notification-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid #2a2a2a;
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.3s ease;
+      animation: slideIn 0.4s ease;
+      position: relative;
+    }
+
+    .notification-card:hover {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: #3a3a3a;
+      transform: translateX(4px);
+    }
+
+    .notification-card.unread {
+      border-left: 4px solid #00ff7f;
+      background: rgba(0, 255, 127, 0.03);
+    }
+
+    .notification-icon {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .notification-icon.gift {
+      background: linear-gradient(135deg, rgba(255, 107, 107, 0.2), rgba(255, 193, 7, 0.2));
+      border: 2px solid rgba(255, 193, 7, 0.4);
+    }
+
+    .notification-icon.system {
+      background: linear-gradient(135deg, rgba(33, 150, 243, 0.2), rgba(3, 169, 244, 0.2));
+      border: 2px solid rgba(33, 150, 243, 0.4);
+    }
+
+    .notification-icon.success {
+      background: linear-gradient(135deg, rgba(0, 255, 127, 0.2), rgba(0, 200, 100, 0.2));
+      border: 2px solid rgba(0, 255, 127, 0.4);
+    }
+
+    .notification-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .user-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .notification-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .notification-title {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.05em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notification-message {
+      color: #aaa;
+      font-size: 0.95em;
+      line-height: 1.5;
+    }
+
+    .notification-message strong {
+      color: #00ff7f;
+      font-weight: 700;
+    }
+
+    .notification-time {
+      color: #666;
+      font-size: 0.85em;
+      margin-top: 4px;
+    }
+
+    .token-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(0, 255, 127, 0.15);
+      border: 1px solid rgba(0, 255, 127, 0.3);
+      padding: 4px 12px;
+      border-radius: 20px;
+      color: #00ff7f;
+      font-weight: 700;
+      font-size: 0.9em;
+    }
+
+    .unread-dot {
+      width: 10px;
+      height: 10px;
+      background: #00ff7f;
+      border-radius: 50%;
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    .loading-spinner {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 60px;
+    }
+
+    .loading-spinner.show {
+      display: flex;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(0, 255, 127, 0.1);
+      border-top: 4px solid #00ff7f;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 20px;
+      color: #666;
+    }
+
+    .empty-state svg {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 20px;
+      opacity: 0.3;
+    }
+
+    .empty-state-text {
+      font-size: 1.2em;
+      margin-bottom: 8px;
+      color: #888;
+    }
+
+    .empty-state-subtext {
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 20px 15px;
+      }
+
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .notifications-section {
+        padding: 24px 20px;
+      }
+
+      .section-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .notification-card {
+        flex-direction: column;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <br>
+    <div class="header">
+      <div class="header-title">
+        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #00ff7f;">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        <h1>Notifications</h1>
+      </div>
+      <p>Stay updated with your activity</p>
+    </div>
+
+    <div class="notifications-section">
+      <div class="section-header">
+        <div class="section-title-wrapper">
+          <h2 class="section-title">Recent Activity</h2>
+          <span class="notification-count-badge" id="notificationCountBadge">0</span>
+        </div>
+        <button class="mark-all-btn" id="markAllBtn">Mark all as read</button>
+      </div>
+
+      <!-- Loading Spinner -->
+      <div class="loading-spinner show" id="loadingSpinner">
+        <div class="spinner"></div>
+      </div>
+
+      <!-- Notifications Container -->
+      <div class="notifications-container" id="notificationsContainer" style="display: none;">
+        <!-- Notifications will be dynamically inserted here -->
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" id="emptyState" style="display: none;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          <line x1="1" y1="1" x2="23" y2="23"/>
+        </svg>
+        <div class="empty-state-text" id="emptyStateText">No notifications yet</div>
+        <div class="empty-state-subtext" id="emptyStateSubtext">When you receive gifts or updates, they'll appear here</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { ref, getDatabase, get, child, onValue, update } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
+      authDomain: "uamtv-c031c.firebaseapp.com",
+      databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
+      projectId: "uamtv-c031c",
+      storageBucket: "uamtv-c031c.firebasestorage.app",
+      messagingSenderId: "9790917697",
+      appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
+      measurementId: "G-RSXW1XBVQZ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase();
+    const auth = getAuth(app);
+
+    const notificationsContainer = document.getElementById("notificationsContainer");
+    const loadingSpinner = document.getElementById("loadingSpinner");
+    const emptyState = document.getElementById("emptyState");
+    const emptyStateText = document.getElementById("emptyStateText");
+    const emptyStateSubtext = document.getElementById("emptyStateSubtext");
+    const markAllBtn = document.getElementById("markAllBtn");
+    const notificationCountBadge = document.getElementById("notificationCountBadge");
+
+    let currentUserId = null;
+    let lastNotificationCount = 0; // Track previous count to detect new notifications
+
+    // Notification sound
+    const notificationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBjiT2PLJdSYEKIHN89iJOAgZaLvu559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8d2RQAoUXrPp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQgYabvt559NEAxPqOPwtmMcBjiS1/PMeiwGJHfH8N2RQAoUXrTp66hWFApGnt/yv24hBjiU2PLJdSYEKIDP89eJOQ==');
+    
+    // Play notification sound
+    function playNotificationSound() {
+      try {
+        notificationSound.play().catch(err => {
+          console.log('Could not play notification sound:', err);
+        });
+      } catch (error) {
+        console.log('Error playing sound:', error);
+      }
+    }
+
+    // Time ago function
+    function timeAgo(timestamp) {
+      const now = Date.now();
+      const diff = now - timestamp;
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+
+      if (days > 0) return `${days}d ago`;
+      if (hours > 0) return `${hours}h ago`;
+      if (minutes > 0) return `${minutes}m ago`;
+      return 'Just now';
+    }
+
+    // Create notification card
+    function createNotificationCard(notification, notificationId) {
+      const card = document.createElement('div');
+      card.className = `notification-card ${notification.read ? '' : 'unread'}`;
+      card.dataset.id = notificationId;
+
+      let iconHTML = '';
+      let messageHTML = '';
+
+      if (notification.type === 'gift_received') {
+        iconHTML = notification.senderAvatar 
+          ? `<img src="${notification.senderAvatar}" alt="Sender" class="user-avatar">`
+          : `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="2">
+              <rect x="3" y="8" width="18" height="4" rx="1"/>
+              <rect x="5" y="12" width="14" height="9" rx="1"/>
+              <path d="M12 8V4"/>
+              <path d="M8 8c0-2 1-4 4-4s4 2 4 4"/>
+            </svg>`;
+
+        messageHTML = `
+          <div class="notification-title">
+            Gift Received! 🎁
+            ${!notification.read ? '<span class="unread-dot"></span>' : ''}
+          </div>
+          <div class="notification-message">
+            <strong>${notification.senderName}</strong> sent you 
+            <span class="token-badge">
+              💎 ${notification.amount} tokens
+            </span>
+          </div>
+          <div class="notification-time">${timeAgo(notification.timestamp)}</div>
+        `;
+      } else if (notification.type === 'gift_sent') {
+        iconHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#00ff7f" stroke-width="2">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>`;
+
+        messageHTML = `
+          <div class="notification-title">
+            Gift Sent ✓
+            ${!notification.read ? '<span class="unread-dot"></span>' : ''}
+          </div>
+          <div class="notification-message">
+            You sent <span class="token-badge">💎 ${notification.amount} tokens</span> to <strong>${notification.recipientName}</strong>
+          </div>
+          <div class="notification-time">${timeAgo(notification.timestamp)}</div>
+        `;
+      } else {
+        iconHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#03A9F4" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>`;
+
+        messageHTML = `
+          <div class="notification-title">
+            System Notification
+            ${!notification.read ? '<span class="unread-dot"></span>' : ''}
+          </div>
+          <div class="notification-message">${notification.message}</div>
+          <div class="notification-time">${timeAgo(notification.timestamp)}</div>
+        `;
+      }
+
+      const iconClass = notification.type === 'gift_received' ? 'gift' : 
+                       notification.type === 'gift_sent' ? 'success' : 'system';
+
+      card.innerHTML = `
+        <div class="notification-icon ${iconClass}">
+          ${iconHTML}
+        </div>
+        <div class="notification-content">
+          ${messageHTML}
+        </div>
+      `;
+
+      // Mark as read on click
+      card.addEventListener('click', () => {
+        if (!notification.read) {
+          markAsRead(notificationId);
+        }
+      });
+
+      return card;
+    }
+
+    // Mark notification as read
+    async function markAsRead(notificationId) {
+      try {
+        const updates = {};
+        updates[`notifications/${currentUserId}/${notificationId}/read`] = true;
+        await update(ref(db), updates);
+      } catch (error) {
+        console.error("Error marking notification as read:", error);
+      }
+    }
+
+    // Mark all as read
+    markAllBtn.addEventListener('click', async () => {
+      if (!currentUserId || markAllBtn.style.cursor === 'not-allowed') return;
+
+      try {
+        const notificationsRef = ref(db, `notifications/${currentUserId}`);
+        const snapshot = await get(notificationsRef);
+
+        if (snapshot.exists()) {
+          const updates = {};
+          const notifications = snapshot.val();
+
+          Object.keys(notifications).forEach(notifId => {
+            if (!notifications[notifId].read) {
+              updates[`notifications/${currentUserId}/${notifId}/read`] = true;
+            }
+          });
+
+          if (Object.keys(updates).length > 0) {
+            await update(ref(db), updates);
+            // Reload to show updated state
+            loadNotifications(currentUserId);
+          }
+        }
+      } catch (error) {
+        console.error("Error marking all as read:", error);
+      }
+    });
+
+    // Load notifications
+    async function loadNotifications(userId) {
+      loadingSpinner.classList.add('show');
+      notificationsContainer.style.display = 'none';
+      emptyState.style.display = 'none';
+
+      try {
+        const notificationsRef = ref(db, `notifications/${userId}`);
+        const snapshot = await get(notificationsRef);
+
+        loadingSpinner.classList.remove('show');
+
+        if (snapshot.exists()) {
+          const notifications = snapshot.val();
+          const notifArray = Object.entries(notifications)
+            .map(([id, data]) => ({ id, ...data }))
+            .sort((a, b) => b.timestamp - a.timestamp); // Sort by newest first
+
+          // Check if there are any unread notifications
+          const unreadNotifications = notifArray.filter(notif => !notif.read);
+          const unreadCount = unreadNotifications.length;
+
+          // Play sound if new notifications arrived (and not first load)
+          if (lastNotificationCount > 0 && unreadCount > lastNotificationCount) {
+            playNotificationSound();
+            
+            // Optional: Show browser notification if supported
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('New notification!', {
+                body: 'You have new activity',
+                icon: 'https://img.icons8.com/color/96/bell.png'
+              });
+            }
+          }
+          
+          // Update last count
+          lastNotificationCount = unreadCount;
+
+          // Update unread badge
+          if (unreadCount > 0) {
+            notificationCountBadge.textContent = unreadCount;
+            notificationCountBadge.classList.add('show');
+          } else {
+            notificationCountBadge.classList.remove('show');
+          }
+
+          if (notifArray.length === 0) {
+            // No notifications at all
+            notificationsContainer.style.display = 'none';
+            emptyState.style.display = 'block';
+            emptyStateText.textContent = 'No notifications yet';
+            emptyStateSubtext.textContent = 'When you receive gifts or updates, they\'ll appear here';
+            notificationCountBadge.classList.remove('show');
+          } else {
+            notificationsContainer.innerHTML = '';
+            notificationsContainer.style.display = 'flex';
+            emptyState.style.display = 'none';
+
+            notifArray.forEach(notif => {
+              const card = createNotificationCard(notif, notif.id);
+              notificationsContainer.appendChild(card);
+            });
+
+            // Update mark all button visibility
+            if (unreadCount === 0) {
+              markAllBtn.style.opacity = '0.5';
+              markAllBtn.style.cursor = 'not-allowed';
+              markAllBtn.textContent = 'All caught up! ✓';
+            } else {
+              markAllBtn.style.opacity = '1';
+              markAllBtn.style.cursor = 'pointer';
+              markAllBtn.textContent = 'Mark all as read';
+            }
+          }
+        } else {
+          // No notifications in database
+          notificationsContainer.style.display = 'none';
+          emptyState.style.display = 'block';
+          emptyStateText.textContent = 'No notifications yet';
+          emptyStateSubtext.textContent = 'When you receive gifts or updates, they\'ll appear here';
+          markAllBtn.style.display = 'none';
+          notificationCountBadge.classList.remove('show');
+          lastNotificationCount = 0;
+        }
+      } catch (error) {
+        console.error("Error loading notifications:", error);
+        loadingSpinner.classList.remove('show');
+        emptyState.style.display = 'block';
+        emptyStateText.textContent = 'Error loading notifications';
+        emptyStateSubtext.textContent = 'Please try refreshing the page';
+        notificationCountBadge.classList.remove('show');
+      }
+    }
+
+    // Auth state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUserId = user.uid;
+        
+        // Initial load
+        loadNotifications(currentUserId);
+        
+        // Set up real-time listener for new notifications
+        const notificationsRef = ref(db, `notifications/${currentUserId}`);
+        onValue(notificationsRef, (snapshot) => {
+          // Only reload if not the first load
+          if (lastNotificationCount !== 0) {
+            loadNotifications(currentUserId);
+          }
+        });
+        
+        // Request notification permission
+        if ('Notification' in window && Notification.permission === 'default') {
+          Notification.requestPermission();
+        }
+      } else {
+        loadingSpinner.classList.remove('show');
+        notificationsContainer.style.display = 'none';
+        emptyState.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>
