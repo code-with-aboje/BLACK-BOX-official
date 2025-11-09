@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BlackBox</title>
+  <link rel="manifest" href="/manifest.json">
+  
+  <!-- iOS Support -->
+  <link rel="apple-touch-icon" href="/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -476,6 +483,27 @@ console.log('💾 Database ready:', db.app.name);
         console.log("no user found, stay on landing page");
       }
     });
+  </script>
+  <script>
+    // ███╗   ██╗███████╗██╗     ██╗██╗███╗   ██╗
+// ████╗  ██║██╔════╝██║     ██║██║████╗  ██║
+// ██╔██╗ ██║█████╗  ██║     ██║██║██╔██╗ ██║
+// ██║╚██╗██║██╔══╝  ██║     ██║██║██║╚██╗██║
+// ██║ ╚████║███████╗███████╗██║██║██║ ╚████║
+// ╚═╝  ╚═══╝╚══════╝╚══════╝╚═╝╚═╝╚═╝  ╚═══╝
+//                    K E L V I N
+    // ========== PWA SERVICE WORKER REGISTRATION ==========
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(registration => {
+        console.log('✅ SW registered:', registration.scope);
+      })
+      .catch(error => {
+        console.log('❌ SW registration failed:', error);
+      });
+  });
+    }
   </script>
 </body>
 </html>
