@@ -614,11 +614,7 @@
 <body>
     <div class="bg-gradient bg-gradient-1"></div>
     <div class="bg-gradient bg-gradient-2"></div>
-    <audio src="../Assets/musics/loose.mp3" controls id="loose" style="display: none;">
-    </audio>
     
-        <audio src="../Assets/musics/win.mp3" controls id="win" style="display: none;">
-    </audio>
     <div class="container">
         <div class="arena-header">
             <div class="logo">
@@ -781,17 +777,31 @@ const winAlert = document.getElementById('win-alert');
 const loseAlert = document.getElementById('lose-alert');
 const winAmountElement = document.getElementById('win-amount');
 
-const loose = document.getElementById("loose");
-const win = document.getElementById("win");
+// Create audio objects
+const audioAssets = {
+    win: new Audio('../Assets/musics/win.mp3'),
+    loose: new Audio('../Assets/musics/loose.mp3')
+};
 
-//function to play win || loose audio 
+// Preload and configure
+audioAssets.win.preload = 'auto';
+audioAssets.loose.preload = 'auto';
+audioAssets.win.volume = 0.7;
+audioAssets.loose.volume = 0.7;
 
-function playWin(){
-    win.play();
+// Functions to play audio with error handling
+function playWin() {
+    audioAssets.win.currentTime = 0; // Reset to start
+    audioAssets.win.play().catch(err => {
+        console.log('Audio play failed:', err);
+    });
 }
 
-function playLoose(){
-    loose.play();
+function playLoose() {
+    audioAssets.loose.currentTime = 0; // Reset to start
+    audioAssets.loose.play().catch(err => {
+        console.log('Audio play failed:', err);
+    });
 }
 // Firebase Auth State
 onAuthStateChanged(auth, (user) => {
