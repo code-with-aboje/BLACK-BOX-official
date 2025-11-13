@@ -595,18 +595,43 @@ audioAssets.loose.preload = 'auto';
 audioAssets.win.volume = 0.7;
 audioAssets.loose.volume = 0.7;
 
+// Audio unlocked flag
+let audioUnlocked = false;
+
+// Unlock audio on first user interaction
+function unlockAudio() {
+    if (audioUnlocked) return;
+    
+    // Play and immediately pause to unlock
+    audioAssets.win.play().then(() => {
+        audioAssets.win.pause();
+        audioAssets.win.currentTime = 0;
+    }).catch(() => {});
+    
+    audioAssets.loose.play().then(() => {
+        audioAssets.loose.pause();
+        audioAssets.loose.currentTime = 0;
+    }).catch(() => {});
+    
+    audioUnlocked = true;
+    console.log('✅ Audio unlocked');
+}
+
+// Add unlock listener to the place bet button
+placeBetBtn.addEventListener('click', unlockAudio);
+
 // Functions to play audio with error handling
 function playWin() {
-    audioAssets.win.currentTime = 0; // Reset to start
+    audioAssets.win.currentTime = 0;
     audioAssets.win.play().catch(err => {
-        console.log('Audio play failed:', err);
+        console.log('Win audio play failed:', err.message);
     });
 }
 
 function playLoose() {
-    audioAssets.loose.currentTime = 0; // Reset to start
+    audioAssets.loose.currentTime = 0;
     audioAssets.loose.play().catch(err => {
-        console.log('Audio play failed:', err);
+        console.log('Loose audio play failed:', err.message);
     });
 }
 // Firebase Auth State
