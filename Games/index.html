@@ -1,1 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Arena - BlackBox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
 
+        body {
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated background elements */
+        .bg-gradient {
+            position: fixed;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            filter: blur(120px);
+            opacity: 0.15;
+            animation: float 20s ease-in-out infinite;
+            z-index: 0;
+        }
+
+        .bg-gradient-1 {
+            background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+
+        .bg-gradient-2 {
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            bottom: -200px;
+            right: -200px;
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, -100px) scale(1.1); }
+            66% { transform: translate(-50px, 100px) scale(0.9); }
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .arena-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 2px solid #3a3a3a;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo svg {
+            width: 30px;
+            height: 30px;
+            color: #888;
+        }
+
+        .arena-header h1 {
+            font-size: 2em;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+        .arena-header p {
+            color: #888;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        /* Game Category Section */
+        .game-section {
+            margin-bottom: 40px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .section-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #2a2a2a, #1a1a1a);
+            border: 1px solid #3a3a3a;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .section-title {
+            flex: 1;
+        }
+
+        .section-title h2 {
+            font-size: 1.4em;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+        }
+
+        .section-title p {
+            color: #666;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .game-card {
+            background: linear-gradient(135deg, #1a1a1a, #141414);
+            border: 1px solid #2a2a2a;
+            border-radius: 16px;
+            padding: 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 280px;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            border-color: #4a4a4a;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+        }
+
+        .card-red::before { background: linear-gradient(90deg, #ff6b6b, #ee5a6f); }
+        .card-blue::before { background: linear-gradient(90deg, #4facfe, #00f2fe); }
+        .card-green::before { background: linear-gradient(90deg, #43e97b, #38f9d7); }
+        .card-yellow::before { background: linear-gradient(90deg, #feca57, #ff9ff3); }
+        .card-purple::before { background: linear-gradient(90deg, #a8edea, #fed6e3); }
+        .card-orange::before { background: linear-gradient(90deg, #ff9a56, #ff6a88); }
+
+        .card-image {
+            width: 100%;
+            height: 180px;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .game-card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 15px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: #ffffff;
+            text-align: center;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+        }
+
+        .card-stats {
+            display: flex;
+            justify-content: center;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #3D4BE3, #6C8CFF);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.85em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 2px 8px rgba(61, 75, 227, 0.3);
+        }
+
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(61, 75, 227, 0.4);
+            background: linear-gradient(135deg, #4D5BF3, #7C9CFF);
+        }
+
+        @media (max-width: 768px) {
+            .arena-header h1 {
+                font-size: 1.8em;
+            }
+
+            .section-title h2 {
+                font-size: 1.2em;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .game-card {
+                height: 250px;
+            }
+            
+            .card-image {
+                height: 150px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .arena-header h1 {
+                font-size: 1.6em;
+            }
+
+            .logo {
+                width: 50px;
+                height: 50px;
+            }
+
+            .logo svg {
+                width: 25px;
+                height: 25px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 8px;
+            }
+
+            .section-title h2 {
+                font-size: 1.1em;
+            }
+            
+            .cards-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .game-card {
+                height: 220px;
+            }
+            
+            .card-image {
+                height: 130px;
+            }
+            
+            .card-title {
+                font-size: 0.9em;
+            }
+            
+            .play-btn {
+                padding: 8px 16px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient bg-gradient-1"></div>
+    <div class="bg-gradient bg-gradient-2"></div>
+
+    <div class="container">
+        <div class="arena-header">
+            <div class="logo">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+            </div>
+            <h1>Game Arena</h1>
+            <p>Play games, Double your tokens 💪</p>
+        </div>
+
+        <!-- Dual Games Section -->
+        <div class="game-section">
+            <div class="section-header">
+                <div class="section-icon">⚔️</div>
+                <div class="section-title">
+                    <h2>Dual Games</h2>
+                    <p>Challenge opponents in head-to-head battles</p>
+                </div>
+            </div>
+            <div class="cards-grid">
+                <div class="game-card card-red">
+                    <div class="card-image">
+<img src="../Assets/Game_img/tik_tak.png" alt="Tic Tac Toe">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Tic Tac Toe</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="tic">Play</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card card-blue">
+                    <div class="card-image">
+ <img src="../Assets/Game_img/rock.png" alt="Rock Paper Scissors">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Rock Paper Scissors</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="rock">Play</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chance Games Section -->
+        <div class="game-section">
+            <div class="section-header">
+                <div class="section-icon">🎲</div>
+                <div class="section-title">
+                    <h2>Chance Games</h2>
+                    <p>Test your luck with random outcomes</p>
+                </div>
+            </div>
+            <div class="cards-grid">
+                <div class="game-card card-green">
+<div class="card-image">
+<img src="../Assets/Game_img/flip.png" alt="Flip de Coin">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Flip de Coin</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="flip">Play</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card card-yellow">
+                    <div class="card-image">
+<img src="../Assets/Game_img/dice.png" alt="Roll de Dice">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Roll de Dice</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="dice">Play</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skill Games Section -->
+        <div class="game-section">
+            <div class="section-header">
+                <div class="section-icon">🎯</div>
+                <div class="section-title">
+                    <h2>Skill Games</h2>
+                    <p>Master your abilities and strategies</p>
+                </div>
+            </div>
+            <div class="cards-grid">
+                <div class="game-card card-purple">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1528819622765-d6bcf132f793?w=400&h=300&fit=crop" alt="Chess">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Chess</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="upComing">Play</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card card-orange">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1611224923853-80b023f02d71?w=400&h=300&fit=crop" alt="Puzzle Challenge">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Puzzle Challenge</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="upComing2">Play</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terminal Games Section -->
+        <div class="game-section">
+            <div class="section-header">
+                <div class="section-icon">💻</div>
+                <div class="section-title">
+                    <h2>Terminal Games</h2>
+                    <p>Command line adventures and challenges</p>
+                </div>
+            </div>
+            <div class="cards-grid">
+                <div class="game-card card-red">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=300&fit=crop" alt="Snake Game">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Snake Game</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="upComing3">Play</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="game-card card-blue">
+                    <div class="card-image">
+                        <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=300&fit=crop" alt="Minesweeper">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">Minesweeper</div>
+                        <div class="card-stats">
+                            <button class="play-btn" id="upComing4">Play</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+
+    
+        // Add functionality to play buttons
+        const upComing = document.getElementById("upComing");
+        const upComing2 = document.getElementById("upComing2");
+        const upComing3 = document.getElementById("upComing3");
+        const upComing4 = document.getElementById("upComing4");
+        
+        upComing.addEventListener("click", ()=>{
+            alert("Coming up soon!")
+        });
+        upComing2.addEventListener("click", ()=>{
+            alert("Coming up soon!")
+        });
+
+        upComing3.addEventListener("click", ()=>{
+            alert("Coming up soon!")
+        });
+        
+        upComing4.addEventListener("click", ()=>{
+            alert("Coming up soon!")
+        });
+
+        const dice = document.getElementById("dice");
+        const rock = document.getElementById
+        ("rock");
+        
+        const tic = document.getElementById
+        ("tic");
+        const flip = document.getElementById("flip");
+        
+        
+        dice.addEventListener("click", ()=>{
+            window.location.href = "roll_dice.html";
+        })
+        rock.addEventListener("click", ()=>{
+            window.location.href = "rock_paper.html";
+        });
+        tic.addEventListener("click", ()=>{
+            window.location.href = "tic_tac_toe.html";
+            
+        });
+        
+        flip.addEventListener("click", ()=>{
+            window.location.href = "flip_de_coin.html";
+            
+        })
+        
+    </script>
+</body>
+  </html>
