@@ -983,82 +983,6 @@ function rollDice() {
     
     // Disable choice options and confirm button
     choiceOptions.forEach(option => {
-        option.style.pointerEvents = 'none';
-    });
-    confirmChoiceBtn.disabled = true;
-    
-    // Reset dice animation
-    diceElement.classList.remove('rolling');
-    void diceElement.offsetWidth; // Trigger reflow
-    
-    // Show rolling animation
-    diceResultElement.textContent = "Rolling...";
-    resultText.textContent = "The dice is rolling!";
-    resultDetails.textContent = "";
-    gameStatusText.textContent = 'Dice is rolling...';
-    
-    // Start dice roll animation
-    diceElement.classList.add('rolling');
-    
-    // Determine dice result after animation
-    setTimeout(() => {
-        // Randomly determine dice number (1-6)
-        const randomNumber = Math.floor(Math.random() * 6) + 1;
-        gameState.diceResult = randomNumber;
-        
-        // Determine if it's even or odd
-        const resultType = randomNumber % 2 === 0 ? 'even' : 'odd';
-        
-        // Update dice display to show result
-        showDiceFace(randomNumber);
-        diceResultElement.textContent = `Result: ${randomNumber} (${resultType.toUpperCase()})`;
-        
-        // Determine win/loss
-        const result = gameState.playerChoice === resultType ? 'win' : 'lose';
-        
-        console.log('🎲 DICE ROLL RESULT');
-        console.log('   Dice rolled:', randomNumber);
-        console.log('   Result type:', resultType);
-        console.log('   Player chose:', gameState.playerChoice);
-        console.log('   Outcome:', result.toUpperCase());
-        
-        // Display result
-        displayResult(result, randomNumber, resultType);
-        
-        // Update token balance based on result
-        updateTokenBalance(result);
-    }, 2000);
-}
-
-function showDiceFace(number) {
-    // Reset dice animation class
-    diceElement.classList.remove('rolling');
-    
-    // Set rotation based on the number to show correct face
-    switch (number) {
-        case 1:
-            diceElement.style.transform = 'rotateX(0deg) rotateY(0deg)';
-            break;
-        case 2:
-            diceElement.style.transform = 'rotateX(0deg) rotateY(90deg)';
-            break;
-        case 3:
-            diceElement.style.transform = 'rotateX(-90deg) rotateY(0deg)';
-            break;
-        case 4:
-            diceElement.style.transform = 'rotateX(90deg) rotateY(0deg)';
-            break;
-        case 5:
-            diceElement.style.transform = 'rotateX(0deg) rotateY(-90deg)';
-            break;
-        case 6:
-            diceElement.style.transform = 'rotateX(0deg) rotateY(180deg)';
-            break;
-    }
-}
-function displayResult(result, diceNumber, resultType) {
-    if (result === 'win') {
-        const winAmount = gameState.betAmount * gameState.multiplier;
         resultText.textContent = 'You Win!';
         resultDetails.textContent = `Dice showed ${diceNumber} (${resultType}) - you guessed correctly!`;
         resultText.style.color = '#43e97b';
@@ -1087,6 +1011,376 @@ async function updateTokenBalance(result) {
             
             // Use transaction to atomically add total payout
             const result = await runTransaction(userRef, (currentTokens) => {
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { ref, getDatabase, onValue, runTransaction, get } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+    import { onAuthStateChanged, getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
+        authDomain: "uamtv-c031c.firebaseapp.com",
+        databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
+        projectId: "uamtv-c031c",
+        storageBucket: "uamtv-c031c.firebasestorage.app",
+        messagingSenderId: "9790917697",
+        appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
+        measurementId: "G-RSXW1XBVQZ"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase();
+    
+    console.log('🔥 Firebase initialized');
+    console.log('💾 Database ready');
+    
+    // Firebase variables
+    let userRef;
+    let currentUser = null;
+    
+    // Game state
+    const gameState = {
+        betAmount: 0,
+        multiplier: 2,
+        playerTokenBalance: 0,
+        gameActive: false,
+        betPlaced: false,
+        playerChoice: null,
+        diceResult: null
+    };
+    
+    // DOM Elements
+    const tokenBalanceElement = document.getElementById('token-balance');
+    const betAmountInput = document.getElementById('bet-amount');
+    const multiplierButtons = document.querySelectorAll('.multiplier-btn');
+    const potentialWinElement = document.getElementById('potential-win');
+    const placeBetBtn = document.getElementById('place-bet-btn');
+    const currentBetElement = document.getElementById('current-bet');
+    const currentMultiplierElement = document.getElementById('current-multiplier');
+    const choiceOptions = document.querySelectorAll('.choice-option');
+    const confirmChoiceBtn = document.getElementById('confirm-choice-btn');
+    const diceElement = document.getElementById('dice');
+    const diceResultElement = document.getElementById('dice-result');
+    const resultText = document.getElementById('result-text');
+    const resultDetails = document.getElementById('result-details');
+    const gameStatusText = document.getElementById('game-status-text');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const newBetBtn = document.getElementById('new-bet-btn');
+    const winAlert = document.getElementById('win-alert');
+    const loseAlert = document.getElementById('lose-alert');
+    const winAmountElement = document.getElementById('win-amount');
+    
+    // Create audio objects
+    const audioAssets = {
+        win: new Audio('../Assets/musics/win.mp3'),
+        loose: new Audio('../Assets/musics/loose.mp3')
+    };
+    
+    audioAssets.win.preload = 'auto';
+    audioAssets.loose.preload = 'auto';
+    audioAssets.win.volume = 0.7;
+    audioAssets.loose.volume = 0.7;
+    
+    let audioUnlocked = false;
+    
+    function unlockAudio() {
+        if (audioUnlocked) return;
+        
+        audioAssets.win.play().then(() => {
+            audioAssets.win.pause();
+            audioAssets.win.currentTime = 0;
+        }).catch(() => {});
+        
+        audioAssets.loose.play().then(() => {
+            audioAssets.loose.pause();
+            audioAssets.loose.currentTime = 0;
+        }).catch(() => {});
+        
+        audioUnlocked = true;
+        console.log('✅ Audio unlocked');
+    }
+    
+    placeBetBtn.addEventListener('click', unlockAudio);
+    
+    function playWin() {
+        audioAssets.win.currentTime = 0;
+        audioAssets.win.play().catch(err => {
+            console.log('Win audio play failed:', err.message);
+        });
+    }
+    
+    function playLoose() {
+        audioAssets.loose.currentTime = 0;
+        audioAssets.loose.play().catch(err => {
+            console.log('Loose audio play failed:', err.message);
+        });
+    }
+    
+    // Firebase Auth State
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            currentUser = user;
+            const userId = user.uid;
+            userRef = ref(db, "users/" + userId + "/tokens");
+            
+            onValue(userRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const tokens = snapshot.val();
+                    gameState.playerTokenBalance = tokens;
+                    tokenBalanceElement.textContent = tokens;
+                    
+                    console.log("✅ Balance synced from Firebase:", tokens);
+                    
+                    if (tokens === 0) {
+                        placeBetBtn.disabled = true;
+                        if (!gameState.betPlaced) {
+                            gameStatusText.textContent = 'No tokens left! Game over.';
+                        }
+                    } else if (!gameState.betPlaced) {
+                        placeBetBtn.disabled = false;
+                        gameStatusText.textContent = 'Place a bet to start playing';
+                    }
+                }
+            }, (error) => {
+                console.error("Error fetching user data:", error);
+            });
+        } else {
+            console.log("No user logged in");
+        }
+    });
+    
+    // Event Listeners
+    betAmountInput.addEventListener('input', updatePotentialWin);
+    
+    multiplierButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            multiplierButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            gameState.multiplier = parseInt(this.getAttribute('data-multiplier'));
+            updatePotentialWin();
+        });
+    });
+    
+    placeBetBtn.addEventListener('click', placeBet);
+    
+    choiceOptions.forEach(option => {
+        option.addEventListener('click', function() {
+            if (!gameState.gameActive || !gameState.betPlaced) return;
+            
+            choiceOptions.forEach(opt => opt.classList.remove('selected'));
+            this.classList.add('selected');
+            gameState.playerChoice = this.getAttribute('data-choice');
+            
+            confirmChoiceBtn.disabled = false;
+            diceResultElement.textContent = `You chose: ${gameState.playerChoice.toUpperCase()}`;
+        });
+    });
+    
+    confirmChoiceBtn.addEventListener('click', rollDice);
+    playAgainBtn.addEventListener('click', playAgain);
+    newBetBtn.addEventListener('click', newBet);
+    
+    // Functions
+    function updatePotentialWin() {
+        const betAmount = parseInt(betAmountInput.value) || 0;
+        const potentialWin = betAmount * gameState.multiplier;
+        potentialWinElement.textContent = `${potentialWin} tokens`;
+    }
+    
+    async function placeBet() {
+            const betAmount = parseInt(betAmountInput.value);
+            
+            if (!currentUser) {
+                alert('Please log in to play');
+                return;
+            }
+            
+            if (betAmount < 50) {
+                alert('Minimum bet is 50 tokens');
+                return;
+            }
+            
+            if (gameState.playerTokenBalance === 0) {
+                alert('You have no tokens left to bet!');
+                return;
+            }
+            
+            if (betAmount > gameState.playerTokenBalance) {
+                alert('Insufficient tokens');
+                return;
+            }
+            
+            console.log('💰 PLACING BET');
+            console.log('   Bet amount:', betAmount);
+    console.log('   Multiplier:', gameState.multiplier + 'x');
+    console.log('   Balance BEFORE bet:', gameState.playerTokenBalance);
+    
+    try {
+        const result = await runTransaction(userRef, (currentTokens) => {
+            if (currentTokens === null) {
+                return currentTokens;
+            }
+            if (currentTokens < betAmount) {
+                console.error('Insufficient tokens in transaction');
+                return;
+            }
+            const newBalance = currentTokens - betAmount;
+            console.log('   Deducting', betAmount, 'tokens');
+            console.log('   Balance AFTER bet:', newBalance);
+            return newBalance;
+        });
+        
+        if (result.committed) {
+            console.log("✅ Bet placed successfully - tokens deducted");
+            
+            gameState.betAmount = betAmount;
+            gameState.betPlaced = true;
+            gameState.gameActive = true;
+            
+            currentBetElement.textContent = betAmount;
+            currentMultiplierElement.textContent = `${gameState.multiplier}x`;
+            gameStatusText.textContent = "Select even or odd!";
+            
+            betAmountInput.disabled = true;
+            placeBetBtn.disabled = true;
+            multiplierButtons.forEach(btn => {
+                btn.style.pointerEvents = 'none';
+                btn.style.opacity = '0.6';
+            });
+            
+            choiceOptions.forEach(option => {
+                option.style.pointerEvents = 'auto';
+            });
+        }
+    } catch (err) {
+        console.error("❌ Error placing bet:", err);
+        alert('Error placing bet. Please try again.');
+    }
+}
+
+// ENHANCED DICE ROLL WITH WEIGHTED PROBABILITY
+function rollDice() {
+    if (!gameState.playerChoice) return;
+    
+    gameState.gameActive = false;
+    
+    choiceOptions.forEach(option => {
+        option.style.pointerEvents = 'none';
+    });
+    confirmChoiceBtn.disabled = true;
+    
+    diceElement.classList.remove('rolling');
+    void diceElement.offsetWidth;
+    
+    diceResultElement.textContent = "Rolling...";
+    resultText.textContent = "The dice is rolling!";
+    resultDetails.textContent = "";
+    gameStatusText.textContent = 'Dice is rolling...';
+    
+    diceElement.classList.add('rolling');
+    
+    setTimeout(() => {
+        // Weighted dice roll - AI has slight advantage
+        const randomNumber = getWeightedDiceRoll(gameState.playerChoice);
+        gameState.diceResult = randomNumber;
+        
+        const resultType = randomNumber % 2 === 0 ? 'even' : 'odd';
+        
+        showDiceFace(randomNumber);
+        diceResultElement.textContent = `Result: ${randomNumber} (${resultType.toUpperCase()})`;
+        
+        const result = gameState.playerChoice === resultType ? 'win' : 'lose';
+        
+        console.log('🎲 DICE ROLL RESULT');
+        console.log('   Dice rolled:', randomNumber);
+        console.log('   Result type:', resultType);
+        console.log('   Player chose:', gameState.playerChoice);
+        console.log('   Outcome:', result.toUpperCase());
+        
+        displayResult(result, randomNumber, resultType);
+        updateTokenBalance(result);
+    }, 2000);
+}
+
+// Weighted dice algorithm - favors opposite of player choice
+function getWeightedDiceRoll(playerChoice) {
+    // Determine what would make player lose
+    const losingType = playerChoice === 'even' ? 'odd' : 'even';
+    
+    // 60% chance to roll against player, 40% fair
+    const roll = Math.random();
+    
+    if (roll < 0.60) {
+        // Weight against player
+        if (losingType === 'even') {
+            // Return even number (2, 4, 6)
+            const evenNumbers = [2, 4, 6];
+            return evenNumbers[Math.floor(Math.random() * evenNumbers.length)];
+        } else {
+            // Return odd number (1, 3, 5)
+            const oddNumbers = [1, 3, 5];
+            return oddNumbers[Math.floor(Math.random() * oddNumbers.length)];
+        }
+    } else {
+        // Fair roll
+        return Math.floor(Math.random() * 6) + 1;
+    }
+}
+
+function showDiceFace(number) {
+    diceElement.classList.remove('rolling');
+    
+    switch (number) {
+        case 1:
+            diceElement.style.transform = 'rotateX(0deg) rotateY(0deg)';
+            break;
+        case 2:
+            diceElement.style.transform = 'rotateX(0deg) rotateY(90deg)';
+            break;
+        case 3:
+            diceElement.style.transform = 'rotateX(-90deg) rotateY(0deg)';
+            break;
+        case 4:
+            diceElement.style.transform = 'rotateX(90deg) rotateY(0deg)';
+            break;
+        case 5:
+            diceElement.style.transform = 'rotateX(0deg) rotateY(-90deg)';
+            break;
+        case 6:
+            diceElement.style.transform = 'rotateX(0deg) rotateY(180deg)';
+            break;
+    }
+}
+
+function displayResult(result, diceNumber, resultType) {
+    if (result === 'win') {
+        const winAmount = gameState.betAmount * gameState.multiplier;
+        resultText.textContent = 'You Win!';
+        resultDetails.textContent = `Dice showed ${diceNumber} (${resultType}) - you guessed correctly!`;
+        resultText.style.color = '#43e97b';
+        gameStatusText.textContent = 'You won! Place a new bet to play again.';
+    } else {
+        resultText.textContent = 'You Lose!';
+        resultDetails.textContent = `Dice showed ${diceNumber} (${resultType}) - better luck next time!`;
+        resultText.style.color = '#ff6b6b';
+        gameStatusText.textContent = 'You lost! Place a new bet to play again.';
+    }
+}
+
+async function updateTokenBalance(result) {
+    try {
+        if (result === 'win') {
+            const winnings = gameState.betAmount * gameState.multiplier;
+            const totalPayout = gameState.betAmount + winnings;
+            playWin();
+            console.log('🎉 PLAYER WON!');
+            console.log('   Bet amount:', gameState.betAmount);
+            console.log('   Multiplier:', gameState.multiplier + 'x');
+            console.log('   Winnings:', winnings);
+            console.log('   Total payout (bet + winnings):', totalPayout);
+            console.log('   Balance BEFORE payout:', gameState.playerTokenBalance);
+            
+            const result = await runTransaction(userRef, (currentTokens) => {
                 if (currentTokens === null) {
                     return currentTokens;
                 }
@@ -1102,7 +1396,6 @@ async function updateTokenBalance(result) {
                 console.log("✅ Win processed successfully");
             }
         } else {
-            // User loses - tokens ALREADY deducted when bet was placed
             playLoose();
             console.log('😢 PLAYER LOST!');
             console.log('   Lost bet amount:', gameState.betAmount);
@@ -1112,7 +1405,6 @@ async function updateTokenBalance(result) {
             showAlert(loseAlert, `Sorry! You lost ${gameState.betAmount} tokens.`);
         }
         
-        // Check if user has run out of tokens
         setTimeout(() => {
             if (gameState.playerTokenBalance === 0) {
                 gameStatusText.textContent = 'No tokens left! Game over.';
@@ -1136,7 +1428,6 @@ function showAlert(alertElement, message) {
 async function playAgain() {
     if (!gameState.betPlaced) return;
     
-    // Check if user has enough tokens to play again with same bet
     if (gameState.playerTokenBalance < gameState.betAmount) {
         alert('Insufficient tokens to play again with the same bet. Please place a new bet.');
         newBet();
@@ -1150,14 +1441,13 @@ async function playAgain() {
     console.log('   Balance BEFORE bet:', gameState.playerTokenBalance);
     
     try {
-        // Use transaction to atomically deduct tokens for new round
         const result = await runTransaction(userRef, (currentTokens) => {
             if (currentTokens === null) {
                 return currentTokens;
             }
             if (currentTokens < betAmount) {
                 console.error('Insufficient tokens in transaction');
-                return; // Abort transaction
+                return;
             }
             const newBalance = currentTokens - betAmount;
             console.log('   Deducting', betAmount, 'tokens');
@@ -1172,7 +1462,6 @@ async function playAgain() {
             gameState.playerChoice = null;
             gameState.diceResult = null;
             
-            // Reset UI
             diceElement.classList.remove('rolling');
             diceElement.style.transform = 'rotateX(0) rotateY(0)';
             diceResultElement.textContent = 'Ready to roll!';
@@ -1181,7 +1470,6 @@ async function playAgain() {
             resultText.style.color = '#ffffff';
             gameStatusText.textContent = 'Select even or odd!';
             
-            // Re-enable choice options
             choiceOptions.forEach(option => {
                 option.style.pointerEvents = 'auto';
                 option.classList.remove('selected');
@@ -1195,7 +1483,6 @@ async function playAgain() {
 }
 
 function newBet() {
-    // Reset game state
     gameState.gameActive = false;
     gameState.betPlaced = false;
     gameState.playerChoice = null;
@@ -1204,7 +1491,6 @@ function newBet() {
     console.log('🆕 NEW BET - Resetting game');
     console.log('   Current balance:', gameState.playerTokenBalance);
     
-    // Reset UI
     diceElement.classList.remove('rolling');
     diceElement.style.transform = 'rotateX(0) rotateY(0)';
     diceResultElement.textContent = 'Ready to roll!';
@@ -1215,7 +1501,6 @@ function newBet() {
     currentBetElement.textContent = '0';
     currentMultiplierElement.textContent = '1x';
     
-    // Enable betting section only if user has tokens
     betAmountInput.disabled = false;
     
     if (gameState.playerTokenBalance === 0) {
@@ -1231,7 +1516,6 @@ function newBet() {
         btn.style.opacity = '1';
     });
     
-    // Disable choice options
     choiceOptions.forEach(option => {
         option.style.pointerEvents = 'none';
         option.classList.remove('selected');
@@ -1242,7 +1526,6 @@ function newBet() {
 // Initialize
 updatePotentialWin();
 
-// Disable choice options initially
 choiceOptions.forEach(option => {
     option.style.pointerEvents = 'none';
 });
