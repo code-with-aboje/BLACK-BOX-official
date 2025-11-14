@@ -1202,6 +1202,558 @@ async function playAgain() {
             
             // Re-enable choice options
             choiceOptions.forEach(option => {
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+import { ref, getDatabase, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+import { onAuthStateChanged, getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBsOwXNtfaWwEh3qaM0suXafOg6CYLzDC8",
+    authDomain: "uamtv-c031c.firebaseapp.com",
+    databaseURL: "https://uamtv-c031c-default-rtdb.firebaseio.com",
+    projectId: "uamtv-c031c",
+    storageBucket: "uamtv-c031c.firebasestorage.app",
+    messagingSenderId: "9790917697",
+    appId: "1:9790917697:web:275c8347b7688e0ac38ac0",
+    measurementId: "G-RSXW1XBVQZ"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase();
+
+console.log('🔥 Firebase initialized');
+console.log('💾 Database ready');
+
+// Firebase variables
+let userRef;
+let currentUser = null;
+
+// Game state
+const gameState = {
+    betAmount: 0,
+    multiplier: 2,
+    playerTokenBalance: 0,
+    gameActive: false,
+    betPlaced: false,
+    playerChoice: null,
+    // AI Pattern Recognition
+    playerHistory: [],
+    patternLength: 3,
+    patterns: {}
+};
+
+// DOM Elements
+const tokenBalanceElement = document.getElementById('token-balance');
+const betAmountInput = document.getElementById('bet-amount');
+const multiplierButtons = document.querySelectorAll('.multiplier-btn');
+const potentialWinElement = document.getElementById('potential-win');
+const placeBetBtn = document.getElementById('place-bet-btn');
+const currentBetElement = document.getElementById('current-bet');
+const currentMultiplierElement = document.getElementById('current-multiplier');
+const choiceOptions = document.querySelectorAll('.choice-option');
+const confirmChoiceBtn = document.getElementById('confirm-choice-btn');
+const playerChoiceIcon = document.getElementById('player-choice-icon');
+const playerChoiceName = document.getElementById('player-choice-name');
+const aiChoiceIcon = document.getElementById('ai-choice-icon');
+const aiChoiceName = document.getElementById('ai-choice-name');
+const resultText = document.getElementById('result-text');
+const resultDetails = document.getElementById('result-details');
+const gameStatusText = document.getElementById('game-status-text');
+const playAgainBtn = document.getElementById('play-again-btn');
+const newBetBtn = document.getElementById('new-bet-btn');
+const winAlert = document.getElementById('win-alert');
+const loseAlert = document.getElementById('lose-alert');
+const winAmountElement = document.getElementById('win-amount');
+
+// Create audio objects
+const audioAssets = {
+    win: new Audio('../Assets/musics/win.mp3'),
+    loose: new Audio('../Assets/musics/loose.mp3')
+};
+
+audioAssets.win.preload = 'auto';
+audioAssets.loose.preload = 'auto';
+audioAssets.win.volume = 0.7;
+audioAssets.loose.volume = 0.7;
+
+let audioUnlocked = false;
+
+function unlockAudio() {
+    if (audioUnlocked) return;
+    
+    audioAssets.win.play().then(() => {
+        audioAssets.win.pause();
+        audioAssets.win.currentTime = 0;
+    }).catch(() => {});
+    
+    audioAssets.loose.play().then(() => {
+        audioAssets.loose.pause();
+        audioAssets.loose.currentTime = 0;
+    }).catch(() => {});
+    
+    audioUnlocked = true;
+    console.log('✅ Audio unlocked');
+}
+
+placeBetBtn.addEventListener('click', unlockAudio);
+
+function playWin() {
+    audioAssets.win.currentTime = 0;
+    audioAssets.win.play().catch(err => {
+        console.log('Win audio play failed:', err.message);
+    });
+}
+
+function playLoose() {
+    audioAssets.loose.currentTime = 0;
+    audioAssets.loose.play().catch(err => {
+        console.log('Loose audio play failed:', err.message);
+    });
+}
+
+// Firebase Auth State
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        currentUser = user;
+        const userId = user.uid;
+        userRef = ref(db, "users/" + userId + "/tokens");
+
+        onValue(userRef, (snapshot) => {
+            if (snapshot.exists()) {
+                const tokens = snapshot.val();
+                gameState.playerTokenBalance = tokens;
+                tokenBalanceElement.textContent = tokens;
+                
+                console.log("✅ Balance synced from Firebase:", tokens);
+                
+                if (tokens === 0) {
+                    placeBetBtn.disabled = true;
+                    if (!gameState.betPlaced) {
+                        gameStatusText.textContent = 'No tokens left! Game over.';
+                    }
+                } else if (!gameState.betPlaced) {
+                    placeBetBtn.disabled = false;
+                    gameStatusText.textContent = 'Place a bet to start playing';
+                }
+            }
+        }, (error) => {
+            console.error("Error fetching user data:", error);
+        });
+    } else {
+        console.log("No user logged in");
+    }
+});
+
+// Event Listeners
+betAmountInput.addEventListener('input', updatePotentialWin);
+
+multiplierButtons.forEach(button => {
+    button.addEventListener('click', function() {
+        multiplierButtons.forEach(btn => btn.classList.remove('active'));
+        this.classList.add('active');
+        gameState.multiplier = parseInt(this.getAttribute('data-multiplier'));
+        updatePotentialWin();
+    });
+});
+
+placeBetBtn.addEventListener('click', placeBet);
+
+choiceOptions.forEach(option => {
+    option.addEventListener('click', function() {
+        if (!gameState.gameActive || !gameState.betPlaced) return;
+        
+        choiceOptions.forEach(opt => opt.classList.remove('selected'));
+        this.classList.add('selected');
+        gameState.playerChoice = this.getAttribute('data-choice');
+        
+        confirmChoiceBtn.disabled = false;
+    });
+});
+
+confirmChoiceBtn.addEventListener('click', confirmChoice);
+playAgainBtn.addEventListener('click', playAgain);
+newBetBtn.addEventListener('click', newBet);
+
+// Functions
+function updatePotentialWin() {
+    const betAmount = parseInt(betAmountInput.value) || 0;
+    const potentialWin = betAmount * gameState.multiplier;
+    potentialWinElement.textContent = `${potentialWin} tokens`;
+}
+
+async function placeBet() {
+    const betAmount = parseInt(betAmountInput.value);
+    
+    if (!currentUser) {
+        alert('Please log in to play');
+        return;
+    }
+    
+    if (betAmount < 50) {
+        alert('Minimum bet is 50 tokens');
+        return;
+    }
+    
+    if (gameState.playerTokenBalance === 0) {
+        alert('You have no tokens left to bet!');
+        return;
+    }
+    
+    if (betAmount > gameState.playerTokenBalance) {
+        alert('Insufficient tokens');
+        return;
+    }
+    
+    console.log('💰 PLACING BET');
+    console.log('   Bet amount:', betAmount);
+    console.log('   Multiplier:', gameState.multiplier + 'x');
+    console.log('   Balance BEFORE bet:', gameState.playerTokenBalance);
+    
+    try {
+        const result = await runTransaction(userRef, (currentTokens) => {
+            if (currentTokens === null) {
+                return currentTokens;
+            }
+            if (currentTokens < betAmount) {
+                console.error('Insufficient tokens in transaction');
+                return;
+            }
+            const newBalance = currentTokens - betAmount;
+            console.log('   Deducting', betAmount, 'tokens');
+            console.log('   Balance AFTER bet:', newBalance);
+            return newBalance;
+        });
+        
+        if (result.committed) {
+            console.log("✅ Bet placed successfully - tokens deducted");
+            
+            gameState.betAmount = betAmount;
+            gameState.betPlaced = true;
+            gameState.gameActive = true;
+            
+            currentBetElement.textContent = betAmount;
+            currentMultiplierElement.textContent = `${gameState.multiplier}x`;
+            gameStatusText.textContent = "Select your move!";
+            
+            betAmountInput.disabled = true;
+            placeBetBtn.disabled = true;
+            multiplierButtons.forEach(btn => {
+                btn.style.pointerEvents = 'none';
+                btn.style.opacity = '0.6';
+            });
+            
+            choiceOptions.forEach(option => {
+                option.style.pointerEvents = 'auto';
+            });
+        }
+    } catch (err) {
+        console.error("❌ Error placing bet:", err);
+        alert('Error placing bet. Please try again.');
+    }
+}
+
+function confirmChoice() {
+    if (!gameState.playerChoice) return;
+    
+    gameState.gameActive = false;
+    
+    choiceOptions.forEach(option => {
+        option.style.pointerEvents = 'none';
+    });
+    confirmChoiceBtn.disabled = true;
+    
+    playerChoiceIcon.textContent = getChoiceEmoji(gameState.playerChoice);
+    playerChoiceName.textContent = capitalizeFirst(gameState.playerChoice);
+    
+    aiChoiceIcon.textContent = '...';
+    aiChoiceName.textContent = 'Thinking...';
+    resultText.textContent = 'AI is choosing...';
+    resultDetails.textContent = '';
+    gameStatusText.textContent = 'AI is thinking...';
+    
+    setTimeout(() => {
+        const aiChoice = getAIChoice();
+        const result = determineWinner(gameState.playerChoice, aiChoice);
+        
+        // Update player history for pattern recognition
+        gameState.playerHistory.push(gameState.playerChoice);
+        if (gameState.playerHistory.length > 10) {
+            gameState.playerHistory.shift();
+        }
+        
+        aiChoiceIcon.textContent = getChoiceEmoji(aiChoice);
+        aiChoiceName.textContent = capitalizeFirst(aiChoice);
+        
+        console.log('🎮 GAME RESULT');
+        console.log('   Player chose:', gameState.playerChoice);
+        console.log('   AI chose:', aiChoice);
+        console.log('   Outcome:', result.toUpperCase());
+        console.log('   Player history:', gameState.playerHistory);
+        
+        displayResult(result, gameState.playerChoice, aiChoice);
+        updateTokenBalance(result);
+    }, 1500);
+}
+
+// ENHANCED AI WITH PATTERN RECOGNITION
+function getAIChoice() {
+    const choices = ['rock', 'paper', 'scissors'];
+    
+    // If not enough history, use strategic randomness with slight bias
+    if (gameState.playerHistory.length < gameState.patternLength) {
+        // 60% strategic, 40% counter-intuitive
+        if (Math.random() < 0.6) {
+            return getCounterMove(choices[Math.floor(Math.random() * choices.length)]);
+        } else {
+            return choices[Math.floor(Math.random() * choices.length)];
+        }
+    }
+    
+    // Pattern recognition: look for recent patterns
+    const recentPattern = gameState.playerHistory.slice(-gameState.patternLength).join('');
+    
+    // Check if this pattern exists in history
+    let patternPrediction = null;
+    if (gameState.patterns[recentPattern]) {
+        const predictions = gameState.patterns[recentPattern];
+        // Get most common next move
+        const mostCommon = Object.keys(predictions).reduce((a, b) => 
+            predictions[a] > predictions[b] ? a : b
+        );
+        patternPrediction = mostCommon;
+    }
+    
+    // Update pattern database
+    if (gameState.playerHistory.length >= gameState.patternLength + 1) {
+        const prevPattern = gameState.playerHistory.slice(-gameState.patternLength - 1, -1).join('');
+        const nextMove = gameState.playerHistory[gameState.playerHistory.length - 1];
+        
+        if (!gameState.patterns[prevPattern]) {
+            gameState.patterns[prevPattern] = {};
+        }
+        gameState.patterns[prevPattern][nextMove] = (gameState.patterns[prevPattern][nextMove] || 0) + 1;
+    }
+    
+    // Decision making with multiple strategies
+    const strategy = Math.random();
+    
+    if (strategy < 0.4 && patternPrediction) {
+        // 40% - Use pattern prediction and counter it
+        console.log('🧠 AI using pattern recognition:', patternPrediction);
+        return getCounterMove(patternPrediction);
+    } else if (strategy < 0.7) {
+        // 30% - Counter the most recent move
+        const lastMove = gameState.playerHistory[gameState.playerHistory.length - 1];
+        console.log('🎯 AI countering last move:', lastMove);
+        return getCounterMove(lastMove);
+    } else if (strategy < 0.85) {
+        // 15% - Meta-strategy: assume player will switch
+        const lastMove = gameState.playerHistory[gameState.playerHistory.length - 1];
+        const playerMightSwitch = getNextInCycle(lastMove);
+        console.log('🔄 AI predicting player switch to:', playerMightSwitch);
+        return getCounterMove(playerMightSwitch);
+    } else {
+        // 15% - Random to avoid being too predictable
+        console.log('🎲 AI using random move');
+        return choices[Math.floor(Math.random() * choices.length)];
+    }
+}
+
+function getCounterMove(playerMove) {
+    const counters = {
+        'rock': 'paper',
+        'paper': 'scissors',
+        'scissors': 'rock'
+    };
+    return counters[playerMove];
+}
+
+function getNextInCycle(currentMove) {
+    const cycle = {
+        'rock': 'paper',
+        'paper': 'scissors',
+        'scissors': 'rock'
+    };
+    return cycle[currentMove];
+}
+
+function determineWinner(playerChoice, aiChoice) {
+    if (playerChoice === aiChoice) {
+        return 'draw';
+    }
+    
+    if (
+        (playerChoice === 'rock' && aiChoice === 'scissors') ||
+        (playerChoice === 'paper' && aiChoice === 'rock') ||
+        (playerChoice === 'scissors' && aiChoice === 'paper')
+    ) {
+        return 'win';
+    }
+    
+    return 'lose';
+}
+
+function getChoiceEmoji(choice) {
+    const emojis = {
+        'rock': '✊',
+        'paper': '📄',
+        'scissors': '✂️'
+    };
+    return emojis[choice];
+}
+
+function capitalizeFirst(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+function displayResult(result, playerChoice, aiChoice) {
+    const playerChoiceName = capitalizeFirst(playerChoice);
+    const aiChoiceName = capitalizeFirst(aiChoice);
+    
+    if (result === 'win') {
+        resultText.textContent = 'You Win!';
+        resultDetails.textContent = `${playerChoiceName} beats ${aiChoiceName}`;
+        resultText.style.color = '#43e97b';
+        gameStatusText.textContent = 'You won! Place a new bet to play again.';
+        
+    } else if (result === 'lose') {
+        resultText.textContent = 'You Lose!';
+        resultDetails.textContent = `${aiChoiceName} beats ${playerChoiceName}`;
+        resultText.style.color = '#ff6b6b';
+        gameStatusText.textContent = 'You lost! Place a new bet to play again.';
+        
+    } else {
+        resultText.textContent = "It's a Draw!";
+        resultDetails.textContent = `Both chose ${playerChoiceName}`;
+        resultText.style.color = '#888';
+        gameStatusText.textContent = "It's a draw! Your bet has been returned.";
+    }
+}
+
+async function updateTokenBalance(result) {
+    try {
+        if (result === 'win') {
+            const winnings = gameState.betAmount * gameState.multiplier;
+            const totalPayout = gameState.betAmount + winnings;
+            playWin();
+            console.log('🎉 PLAYER WON!');
+            console.log('   Bet amount:', gameState.betAmount);
+            console.log('   Multiplier:', gameState.multiplier + 'x');
+            console.log('   Winnings:', winnings);
+            console.log('   Total payout (bet + winnings):', totalPayout);
+            console.log('   Balance BEFORE payout:', gameState.playerTokenBalance);
+            
+            const result = await runTransaction(userRef, (currentTokens) => {
+                if (currentTokens === null) {
+                    return currentTokens;
+                }
+                const newBalance = currentTokens + totalPayout;
+                console.log('   Adding', totalPayout, 'tokens');
+                console.log('   Balance AFTER payout:', newBalance);
+                return newBalance;
+            });
+            
+            if (result.committed) {
+                winAmountElement.textContent = winnings;
+                showAlert(winAlert, `Congratulations! You won ${winnings} tokens!`);
+                console.log("✅ Win processed successfully");
+            }
+        } else if (result === 'lose') {
+            playLoose();
+            console.log('😢 PLAYER LOST!');
+            console.log('   Lost bet amount:', gameState.betAmount);
+            console.log('   Current balance:', gameState.playerTokenBalance);
+            console.log('   ⚠️ NO DEDUCTION - tokens were already taken when bet was placed');
+            
+            showAlert(loseAlert, `Sorry! You lost ${gameState.betAmount} tokens.`);
+        } else {
+            console.log('🤝 DRAW!');
+            console.log('   Returning bet amount:', gameState.betAmount);
+            console.log('   Balance BEFORE return:', gameState.playerTokenBalance);
+            
+            const result = await runTransaction(userRef, (currentTokens) => {
+                if (currentTokens === null) {
+                    return currentTokens;
+                }
+                const newBalance = currentTokens + gameState.betAmount;
+                console.log('   Adding back', gameState.betAmount, 'tokens');
+                console.log('   Balance AFTER return:', newBalance);
+                return newBalance;
+            });
+            
+            if (result.committed) {
+                showAlert(loseAlert, "Game ended in a draw. Your bet has been returned.");
+                console.log("✅ Draw processed - bet returned");
+            }
+        }
+        
+        setTimeout(() => {
+            if (gameState.playerTokenBalance === 0) {
+                gameStatusText.textContent = 'No tokens left! Game over.';
+                placeBetBtn.disabled = true;
+            }
+        }, 500);
+    } catch (err) {
+        console.error("❌ Error updating tokens:", err);
+    }
+}
+
+function showAlert(alertElement, message) {
+    alertElement.textContent = message;
+    alertElement.classList.add('show');
+    
+    setTimeout(() => {
+        alertElement.classList.remove('show');
+    }, 3000);
+}
+
+async function playAgain() {
+    if (!gameState.betPlaced) return;
+    
+    if (gameState.playerTokenBalance < gameState.betAmount) {
+        alert('Insufficient tokens to play again with the same bet. Please place a new bet.');
+        newBet();
+        return;
+    }
+    
+    const betAmount = gameState.betAmount;
+    console.log('🔁 PLAYING AGAIN');
+    console.log('   Bet amount:', betAmount);
+    console.log('   Multiplier:', gameState.multiplier + 'x');
+    console.log('   Balance BEFORE bet:', gameState.playerTokenBalance);
+    
+    try {
+        const result = await runTransaction(userRef, (currentTokens) => {
+            if (currentTokens === null) {
+                return currentTokens;
+            }
+            if (currentTokens < betAmount) {
+                console.error('Insufficient tokens in transaction');
+                return;
+            }
+            const newBalance = currentTokens - betAmount;
+            console.log('   Deducting', betAmount, 'tokens');
+            console.log('   Balance AFTER bet:', newBalance);
+            return newBalance;
+        });
+        
+        if (result.committed) {
+            console.log("✅ Play again bet placed successfully");
+            
+            gameState.gameActive = true;
+            gameState.playerChoice = null;
+            
+            playerChoiceIcon.textContent = '?';
+            playerChoiceName.textContent = 'Waiting...';
+            aiChoiceIcon.textContent = '?';
+            aiChoiceName.textContent = 'Waiting...';
+            resultText.textContent = 'Make your move!';
+            resultDetails.textContent = 'Select your choice and confirm to play';
+            resultText.style.color = '#ffffff';
+            gameStatusText.textContent = 'Select your move!';
+            
+            choiceOptions.forEach(option => {
                 option.style.pointerEvents = 'auto';
                 option.classList.remove('selected');
             });
@@ -1214,15 +1766,16 @@ async function playAgain() {
 }
 
 function newBet() {
-    // Reset game state
     gameState.gameActive = false;
     gameState.betPlaced = false;
     gameState.playerChoice = null;
+    // Reset AI learning on new bet session
+    gameState.playerHistory = [];
+    gameState.patterns = {};
     
-    console.log('🆕 NEW BET - Resetting game');
+    console.log('🆕 NEW BET - Resetting game and AI patterns');
     console.log('   Current balance:', gameState.playerTokenBalance);
     
-    // Reset UI
     playerChoiceIcon.textContent = '?';
     playerChoiceName.textContent = 'Waiting...';
     aiChoiceIcon.textContent = '?';
@@ -1234,7 +1787,6 @@ function newBet() {
     currentBetElement.textContent = '0';
     currentMultiplierElement.textContent = '1x';
     
-    // Enable betting section only if user has tokens
     betAmountInput.disabled = false;
     
     if (gameState.playerTokenBalance === 0) {
@@ -1250,7 +1802,6 @@ function newBet() {
         btn.style.opacity = '1';
     });
     
-    // Disable choice options
     choiceOptions.forEach(option => {
         option.style.pointerEvents = 'none';
         option.classList.remove('selected');
@@ -1261,11 +1812,10 @@ function newBet() {
 // Initialize
 updatePotentialWin();
 
-// Disable choice options initially
 choiceOptions.forEach(option => {
     option.style.pointerEvents = 'none';
 });
 confirmChoiceBtn.disabled = true;
-    </script>
+</script>
 </body>
 </html>
