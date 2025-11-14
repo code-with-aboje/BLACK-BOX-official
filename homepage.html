@@ -698,7 +698,7 @@
   Gift
       </button> 
       
-            
+   <!--         
   <button class="nav-btn active" id="gameBtn">
 <svg xmlns="http://www.w3.org/2000/svg"
      viewBox="0 0 24 24"
@@ -717,7 +717,7 @@
 </svg>
   Games
       </button> 
-      
+      -->
 
       <button class="nav-btn active" id="logOutBtn" style="width: 150px;">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
@@ -967,9 +967,10 @@
       document.getElementById("mainframe").src = "Gift/index.html";
     });
 
-    gameBtn.addEventListener("click", () => {
+   /* gameBtn.addEventListener("click", () => {
       document.getElementById("mainframe").src = "Games/index.html";
     });
+    */
     
     logOutBtn.addEventListener("click", async () => {
       const confirmLogout = confirm("Are you sure you want to logout?");
