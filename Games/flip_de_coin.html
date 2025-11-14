@@ -970,54 +970,7 @@ function flipCoin() {
     
     gameState.gameActive = false;
     
-    // Disable choice options and confirm button
-    choiceOptions.forEach(option => {
-        option.style.pointerEvents = 'none';
-    });
-    confirmChoiceBtn.disabled = true;
-    
-    // Reset coin animation
-    coinElement.classList.remove('flipping');
-    void coinElement.offsetWidth; // Trigger reflow
-    
-    // Show flipping animation
-    coinResultElement.textContent = "Flipping...";
-    resultText.textContent = "The coin is flipping!";
-    resultDetails.textContent = "";
-    gameStatusText.textContent = 'Coin is flipping...';
-    
-    // Start coin flip animation
-    coinElement.classList.add('flipping');
-    
-    // Determine coin result after animation
-    setTimeout(() => {
-        const randomResult = Math.random() < 0.5 ? 'heads' : 'tails';
-        gameState.coinResult = randomResult;
-        
-        // Update coin display to show result
-        if (randomResult === 'heads') {
-            coinElement.style.transform = 'rotateY(0deg)';
-        } else {
-            coinElement.style.transform = 'rotateY(180deg)';
-        }
-        
-        coinResultElement.textContent = `Result: ${randomResult.toUpperCase()}`;
-        
-        // Determine win/loss
-        const result = gameState.playerChoice === randomResult ? 'win' : 'lose';
-        
-        console.log('🎲 COIN FLIP RESULT');
-        console.log('   Coin landed on:', randomResult);
-        console.log('   Player chose:', gameState.playerChoice);
-        console.log('   Outcome:', result.toUpperCase());
-        
-        // Display result
-        displayResult(result, randomResult);
-        
-        // Update token balance based on result
-        updateTokenBalance(result);
-    }, 2000);
-}
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 import { ref, getDatabase, onValue, runTransaction, get } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
