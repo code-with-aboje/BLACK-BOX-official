@@ -1,0 +1,69 @@
+name: Bootstrap Capacitor Project
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Init package.json
+        run: npm init -y
+
+      - name: Install Capacitor
+        run: npm install @capacitor/core @capacitor/cli @capacitor/android
+
+      - name: Create dist folder placeholder
+        run: |
+          mkdir -p dist
+          echo "<html><body>Placeholder</body></html>" > dist/index.html
+
+      - name: Write capacitor.config.json
+        run: |
+          cat > capacitor.config.json << 'EOF'
+          {
+            "appId": "com.blackbox.android",
+            "appName": "Black Box",
+            "webDir": "dist",
+            "server": {
+              "url": "https://blackbox-beryl-two.vercel.app",
+              "cleartext": false,
+              "allowNavigation": ["https://blackbox-beryl-two.vercel.app", "*.blackbox-beryl-two.vercel.app"]
+            },
+            "plugins": {
+              "SplashScreen": {
+                "launchShowDuration": 2000,
+                "launchAutoHide": true,
+                "backgroundColor": "#ffffffff",
+                "androidSplashResourceName": "splash",
+                "androidScaleType": "CENTER_CROP",
+                "showSpinner": false,
+                "splashFullScreen": true,
+                "splashImmersive": true
+              }
+            }
+          }
+          EOF
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Sync Capacitor
+        run: npx cap sync android
+
+      - name: Commit scaffolded project back to repo
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Bootstrap Capacitor Android project" || echo "Nothing to commit"
+          git push
