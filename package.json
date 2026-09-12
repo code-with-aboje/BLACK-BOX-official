@@ -1,0 +1,26 @@
+{
+  "name": "black-box-official",
+  "version": "1.0.0",
+  "description": "A secure, interactive web platform embeded   with social, messaging, and file-sharing capabilities. Demonstrates advanced coding and full-stack development expertise.",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/code-with-aboje/BLACK-BOX-official.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/code-with-aboje/BLACK-BOX-official/issues"
+  },
+  "homepage": "https://github.com/code-with-aboje/BLACK-BOX-official#readme",
+  "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/cli": "^8.5.2",
+    "@capacitor/core": "^8.5.2"
+  }
+}
