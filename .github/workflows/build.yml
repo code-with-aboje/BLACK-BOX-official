@@ -48,9 +48,6 @@ jobs:
           }
           EOF
 
-      - name: Generate icons & splash screens
-        run: npx capacitor-assets generate
-
       - name: Sync Capacitor
         run: npx cap sync android
 
@@ -63,6 +60,14 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x android/gradlew
 
+      - name: Build debug APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
       - name: Build debug APK
         run: cd android && ./gradlew assembleDebug
 
