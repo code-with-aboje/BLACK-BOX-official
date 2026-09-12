@@ -48,9 +48,6 @@ jobs:
           }
           EOF
 
-      - name: Generate icons & splash screens
-        run: npx capacitor-assets generate
-
       - name: Sync Capacitor
         run: npx cap sync android
 
